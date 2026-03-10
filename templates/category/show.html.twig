@@ -1,0 +1,142 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}{{ category.name }} - Samaco Brewery{% endblock %}
+
+{% block dashboard_content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    
+    <!-- Page Header -->
+    <div class="mb-8">
+        <!-- Breadcrumb -->
+        <nav class="flex items-center gap-2 text-sm text-gray-400 mb-6">
+            <a href="{{ path('app_category_index') }}" 
+               class="hover:text-yellow-400 transition-colors duration-200">
+                Categories
+            </a>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+            <span class="text-yellow-400 font-medium">{{ category.name }}</span>
+        </nav>
+        
+        <!-- Main Heading -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <h1 class="text-3xl md:text-4xl font-bold text-white mb-2 flex items-center gap-3">
+                    <svg class="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                    </svg>
+                    {{ category.name }}
+                </h1>
+                <p class="text-gray-400 ml-11">Category Details</p>
+            </div>
+            
+            <!-- Back Button -->
+            <a href="{{ path('app_category_index') }}"
+               class="inline-flex items-center gap-2 px-5 py-3 text-sm font-semibold text-gray-300 
+                      bg-gray-800/50 rounded-xl hover:bg-gray-800 hover:text-white transition-all duration-200
+                      border border-gray-700/50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-900
+                      self-start sm:self-center">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Back to Categories
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="space-y-8">
+        
+        <!-- Details Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- ID Card -->
+            <div class="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-xl p-6">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-12 h-12 flex items-center justify-center bg-blue-900/30 rounded-xl border border-blue-800/30">
+                        <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-300">Category ID</h3>
+                </div>
+                <p class="text-3xl font-bold text-yellow-400">#{{ category.id }}</p>
+                <p class="text-sm text-gray-500 mt-2">Unique identifier for this category</p>
+            </div>
+            
+            <!-- Name Card -->
+            <div class="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-xl p-6">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-12 h-12 flex items-center justify-center bg-green-900/30 rounded-xl border border-green-800/30">
+                        <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-300">Category Name</h3>
+                </div>
+                <p class="text-2xl font-bold text-white">{{ category.name }}</p>
+                <p class="text-sm text-gray-500 mt-2">Display name for this beer category</p>
+            </div>
+            
+            <!-- Description Card -->
+            <div class="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-xl p-6 md:col-span-3 lg:col-span-1">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-12 h-12 flex items-center justify-center bg-purple-900/30 rounded-xl border border-purple-800/30">
+                        <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-300">Description</h3>
+                </div>
+                <div class="bg-gray-800/30 rounded-xl p-4 border border-gray-700/30">
+                    <p class="text-gray-300">
+                        {{ category.description ?? 'No description provided for this category.' }}
+                    </p>
+                </div>
+                <p class="text-sm text-gray-500 mt-2">Details about this beer category</p>
+            </div>
+        </div>
+
+        <!-- Actions Section -->
+        <div class="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-xl p-6 md:p-8">
+            <div class="mb-6">
+                <h2 class="text-xl font-bold text-yellow-400 mb-2 flex items-center gap-3">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    Category Actions
+                </h2>
+                <p class="text-gray-400">Manage this category</p>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row gap-4">
+                <!-- Edit Button -->
+                <a href="{{ path('app_category_edit', {'id': category.id}) }}"
+                   class="group inline-flex items-center justify-center gap-3 px-6 py-4 text-base font-semibold 
+                          bg-gradient-to-r from-yellow-600 to-yellow-700 text-black rounded-xl
+                          hover:from-yellow-500 hover:to-yellow-600 active:scale-[0.98]
+                          shadow-lg hover:shadow-xl shadow-yellow-900/30
+                          border border-yellow-800/30 transition-all duration-200
+                          focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-gray-900
+                          flex-1">
+                    
+                    <svg class="w-5 h-5 transition-transform group-hover:scale-110" 
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                    </svg>
+                    
+                    <span>Edit Category</span>
+                </a>
+
+                <!-- Delete Form -->
+                <div class="flex-1">
+                    {{ include('category/_delete_form.html.twig') }}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

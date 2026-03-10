@@ -1,0 +1,109 @@
+<div class="max-w-4xl mx-auto p-4">
+    {{ form_start(form, {'attr': {'class': 'space-y-8'}}) }}
+        
+        <!-- Form Container -->
+        <div class="bg-gray-900/80 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-2xl p-6 md:p-8">
+            
+            <!-- Form Header -->
+            <div class="mb-8">
+                <h2 class="text-2xl md:text-3xl font-bold text-yellow-400 mb-2">
+                    {{ button_label|default('Create Category') }}
+                </h2>
+                <p class="text-gray-400">Add a new beer category to organize your products</p>
+            </div>
+
+            <!-- Form Fields -->
+            <div class="space-y-8">
+                <!-- Name Field -->
+                <div>
+                    {{ form_label(form.name, 'Category Name', {
+                        'label_attr': {
+                            'class': 'block text-sm font-semibold text-yellow-300 mb-2'
+                        }
+                    }) }}
+                    
+                    {{ form_widget(form.name, {
+                        'attr': {
+                            'class': 'w-full px-4 py-3.5 bg-gray-800/50 border border-gray-700 rounded-xl 
+                                     text-white placeholder-gray-500 focus:outline-none focus:ring-2 
+                                     focus:ring-yellow-500 focus:border-yellow-500 transition duration-200
+                                     hover:border-gray-600 text-base md:text-lg',
+                            'placeholder': 'e.g., IPAs, Stouts, Lagers'
+                        }
+                    }) }}
+                    
+                    {% if form.name.vars.errors|length > 0 %}
+                        <div class="mt-2 text-sm text-red-400 space-y-1">
+                            {{ form_errors(form.name) }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Description Field -->
+                <div>
+                    {{ form_label(form.description, 'Description', {
+                        'label_attr': {
+                            'class': 'block text-sm font-semibold text-yellow-300 mb-2'
+                        }
+                    }) }}
+                    
+                    {{ form_widget(form.description, {
+                        'attr': {
+                            'class': 'w-full px-4 py-3.5 bg-gray-800/50 border border-gray-700 rounded-xl 
+                                     text-white placeholder-gray-500 focus:outline-none focus:ring-2 
+                                     focus:ring-yellow-500 focus:border-yellow-500 transition duration-200
+                                     hover:border-gray-600 resize-y min-h-[150px] text-base',
+                            'rows': 5,
+                            'placeholder': 'Describe this beer category...'
+                        }
+                    }) }}
+                    
+                    {% if form.description.vars.errors|length > 0 %}
+                        <div class="mt-2 text-sm text-red-400 space-y-1">
+                            {{ form_errors(form.description) }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 mt-12 pt-8 border-t border-gray-700/50">
+                <!-- Submit Button -->
+                <button type="submit"
+                        class="group inline-flex items-center justify-center gap-3 px-8 py-4 text-base font-bold 
+                               bg-gradient-to-r from-yellow-600 to-yellow-700 text-black rounded-xl
+                               hover:from-yellow-500 hover:to-yellow-600 active:scale-[0.98]
+                               shadow-lg hover:shadow-xl shadow-yellow-900/30
+                               border border-yellow-800/30 transition-all duration-200
+                               focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-gray-900
+                               flex-1 sm:flex-none min-h-[52px]">
+                    
+                    <svg class="w-5 h-5 transition-transform group-hover:scale-110" 
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    
+                    <span>{{ button_label|default('Save Category') }}</span>
+                </button>
+
+                <!-- Cancel Button -->
+                <a href="{{ path('app_category_index') }}"
+                   class="inline-flex items-center justify-center gap-3 px-8 py-4 text-base font-semibold
+                          bg-gray-800/60 text-gray-300 rounded-xl hover:bg-gray-800 hover:text-white
+                          active:scale-[0.98] border border-gray-700/50 transition-all duration-200
+                          focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-900
+                          flex-1 sm:flex-none min-h-[52px]">
+                    
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    
+                    <span>Cancel</span>
+                </a>
+            </div>
+        </div>
+
+    {{ form_end(form) }}
+</div>

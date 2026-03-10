@@ -1,10 +1,11 @@
-import './bootstrap.js';
-/*
- * Welcome to your app's main JavaScript file!
- *
- * This file will be included onto the page via the importmap() Twig function,
- * which should already be in your base.html.twig.
- */
 import './styles/app.css';
 
-console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');
+// Remove jQuery imports from here since we'll load it via CDN in base template
+// import $ from 'jquery';
+// window.$ = window.jQuery = $;
+
+// DataTables will be loaded via CDN in the product template
+// import 'datatables.net';
+// import 'datatables.net-dt/css/dataTables.dataTables.min.css';
+
+console.log('✅ App.js loaded');

@@ -1,0 +1,110 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Login - Samaco Brewery{% endblock %}
+
+{% block body %}
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-black py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8 bg-gray-800 p-8 rounded-2xl shadow-2xl border border-yellow-500/20">
+        <div>
+            <div class="flex justify-center">
+                <div class="bg-gradient-to-r from-yellow-500 to-yellow-300 p-3 rounded-full">
+                    <img src="{{ asset('images/logo.png') }}" alt="Samaco Brewery Logo" class="w-12 h-12 object-contain">
+                </div>
+            </div>
+            <h2 class="mt-6 text-center text-3xl font-extrabold text-yellow-500">
+                Samaco Brewery
+            </h2>
+            <p class="mt-2 text-center text-sm text-gray-300">
+                Sign in to your account
+            </p>
+        </div>
+        
+        <form class="mt-8 space-y-6" method="post">
+            {% if error %}
+                <div class="rounded-md bg-red-900/50 p-4 border border-red-500">
+                    <div class="text-sm text-red-200">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                </div>
+            {% endif %}
+
+            {% if app.user %}
+                <div class="rounded-md bg-blue-900/50 p-4 border border-blue-500">
+                    <p class="text-sm text-blue-200">
+                        You are logged in as <span class="font-semibold">{{ app.user.userIdentifier }}</span>
+                    </p>
+                    <a href="{{ path('app_logout') }}" class="mt-2 inline-flex items-center text-sm text-yellow-400 hover:text-yellow-300">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                        </svg>
+                        Logout
+                    </a>
+                </div>
+            {% endif %}
+
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+            <div class="space-y-6">
+                <div>
+                    <label for="inputEmail" class="block text-sm font-medium text-gray-300 mb-1">
+                        Email address
+                    </label>
+                    <input 
+                        id="inputEmail" 
+                        name="email" 
+                        type="email" 
+                        autocomplete="email" 
+                        required 
+                        value="{{ last_username }}"
+                        class="appearance-none relative block w-full px-4 py-3 border border-gray-600 bg-gray-900 text-white placeholder-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent focus:z-10 sm:text-sm"
+                        placeholder="Enter your email">
+                </div>
+                <div>
+                    <label for="inputPassword" class="block text-sm font-medium text-gray-300 mb-1">
+                        Password
+                    </label>
+                    <input 
+                        id="inputPassword" 
+                        name="password" 
+                        type="password" 
+                        autocomplete="current-password" 
+                        required
+                        class="appearance-none relative block w-full px-4 py-3 border border-gray-600 bg-gray-900 text-white placeholder-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent focus:z-10 sm:text-sm"
+                        placeholder="Enter your password">
+                </div>
+            </div>
+
+            <div>
+                <button type="submit" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-black bg-gradient-to-r from-yellow-500 to-yellow-300 hover:from-yellow-400 hover:to-yellow-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-all duration-200 shadow-lg shadow-yellow-500/25">
+                    <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                        <svg class="h-5 w-5 text-black group-hover:text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+                        </svg>
+                    </span>
+                    Sign in
+                </button>
+            </div>
+        </form>
+
+        <div class="mt-8">
+            <div class="relative">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-700"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-2 bg-gray-800 text-gray-400">
+                        New to Samaco Brewery?
+                    </span>
+                </div>
+            </div>
+
+            <div class="mt-6">
+                <a href="{{ path('app_register') }}" class="w-full flex justify-center py-3 px-4 border-2 border-gray-600 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:border-gray-500 transition-all duration-200">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                    </svg>
+                    Create an account
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

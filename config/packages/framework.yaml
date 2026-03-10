@@ -3,10 +3,17 @@ framework:
     secret: '%env(APP_SECRET)%'
 
     # Note that the session will be started ONLY if you read or write from it.
-    session: true
+    trusted_proxies: '%env(TRUSTED_PROXIES)%'
+    trusted_headers:
+        - 'x-forwarded-for'
+        - 'x-forwarded-proto'
+        - 'x-forwarded-port'
+        - 'x-forwarded-host'
 
-    #esi: true
-    #fragments: true
+    session:
+        enabled: true
+        cookie_secure: auto
+        cookie_samesite: lax
 
 when@test:
     framework:

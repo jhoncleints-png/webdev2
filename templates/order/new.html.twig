@@ -1,0 +1,424 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}New Order - Samaco Brewery{% endblock %}
+
+{% block dashboard_content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    
+    <!-- Page Header -->
+    <div class="mb-8">
+        <!-- Breadcrumb -->
+        <nav class="flex items-center gap-2 text-sm text-gray-400 mb-6">
+            <a href="{{ path('app_dashboard_home') }}" 
+               class="hover:text-yellow-400 transition-colors duration-200">
+                Dashboard
+            </a>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+            <a href="{{ path('app_order_index') }}" 
+               class="hover:text-yellow-400 transition-colors duration-200">
+                Orders
+            </a>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+            <span class="text-yellow-400 font-medium">New Order</span>
+        </nav>
+        
+        <!-- Main Heading -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <h1 class="text-3xl md:text-4xl font-bold text-white mb-2 flex items-center gap-3">
+                    <svg class="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Create New Order
+                </h1>
+                <p class="text-gray-400 ml-11">
+                    Create a new order for your brewery customers
+                </p>
+            </div>
+            
+            <!-- Back Button -->
+            <a href="{{ path('app_order_index') }}"
+               class="inline-flex items-center gap-2 px-5 py-3 text-sm font-semibold text-gray-300 
+                      bg-gray-800/50 rounded-xl hover:bg-gray-800 hover:text-white transition-all duration-200
+                      border border-gray-700/50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-900
+                      self-start sm:self-center">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Back to Orders
+            </a>
+        </div>
+    </div>
+
+    <!-- Form Section -->
+    <div class="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-xl p-6 md:p-8">
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-yellow-400 mb-2 flex items-center gap-3">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Order Details
+            </h2>
+            <p class="text-gray-400">Fill in the details for your new order</p>
+        </div>
+        
+        <!-- Include Form -->
+        <div class="max-w-4xl mx-auto">
+            {{ form_start(form, {'attr': {'class': 'space-y-8', 'id': 'order-form'}}) }}
+                
+                <!-- Customer Field -->
+                <div>
+                    {{ form_label(form.customer, 'Customer', {
+                        'label_attr': {
+                            'class': 'block text-sm font-semibold text-yellow-300 mb-2'
+                        }
+                    }) }}
+                    
+                    {{ form_widget(form.customer, {
+                        'attr': {
+                            'class': 'w-full px-4 py-3.5 bg-gray-800/50 border border-gray-700 rounded-xl 
+                                     text-white placeholder-gray-500 focus:outline-none focus:ring-2 
+                                     focus:ring-yellow-500 focus:border-yellow-500 transition duration-200
+                                     hover:border-gray-600 text-base'
+                        }
+                    }) }}
+                    
+                    {% if form.customer.vars.errors|length > 0 %}
+                        <div class="mt-2 text-sm text-red-400 space-y-1">
+                            {{ form_errors(form.customer) }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Order Items Section -->
+                <div class="bg-gray-800/30 rounded-2xl border border-gray-700/30 p-6">
+                    <h3 class="text-xl font-bold text-yellow-400 mb-6 flex items-center gap-3">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                        </svg>
+                        Order Items
+                    </h3>
+                    
+                    <!-- Order Items Container -->
+                    <div id="order-items" class="space-y-4">
+                        <!-- Items will be added here by JavaScript -->
+                    </div>
+                    
+                    <!-- Hidden Template -->
+                    <div id="item-template" class="hidden">
+                        <div class="order-item bg-gray-900/50 border border-gray-700/50 rounded-xl p-4">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">Product</label>
+                                    <select name="order[orderItems][__index__][product]" 
+                                            class="product-select w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg 
+                                                   text-white focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 
+                                                   transition duration-200">
+                                        <option value="">Select Product</option>
+                                        {% for product in products %}
+                                            <option value="{{ product.id }}" data-price="{{ product.price }}">
+                                                {{ product.name }} - ${{ product.price|number_format(2) }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">Quantity</label>
+                                    <input type="number" name="order[orderItems][__index__][quantity]" 
+                                           class="quantity-input w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg 
+                                                  text-white focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 
+                                                  transition duration-200" min="1" value="1">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">Unit Price</label>
+                                    <input type="text" name="order[orderItems][__index__][unitPrice]" 
+                                           class="unit-price-input w-full px-4 py-3 bg-gray-800/30 border border-gray-700 rounded-lg 
+                                                  text-gray-300 cursor-not-allowed" readonly value="0.00">
+                                </div>
+                            </div>
+                            <button type="button" 
+                                    class="remove-item text-red-400 hover:text-red-300 text-sm font-medium 
+                                           transition-colors duration-200 flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                                Remove Item
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Add Item Buttons -->
+                    <div class="mt-6 space-y-3">
+                        <button type="button" id="add-first-item" 
+                                class="inline-flex items-center gap-2 px-5 py-3 text-sm font-semibold 
+                                       bg-green-900/30 text-green-400 rounded-xl hover:bg-green-900/40 
+                                       transition-all duration-200 border border-green-800/30">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                            Add First Item
+                        </button>
+                        
+                        <button type="button" id="add-item" 
+                                class="hidden inline-flex items-center gap-2 px-5 py-3 text-sm font-semibold 
+                                       bg-green-900/30 text-green-400 rounded-xl hover:bg-green-900/40 
+                                       transition-all duration-200 border border-green-800/30">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                            Add Another Item
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Order Total -->
+                <div class="bg-yellow-900/20 border border-yellow-800/30 rounded-2xl p-6">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <h3 class="text-lg font-bold text-yellow-300">Order Total</h3>
+                        </div>
+                        <div class="text-3xl font-bold text-white">
+                            $<span id="order-total">0.00</span>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-sm mt-2">Total amount for all order items</p>
+                </div>
+
+                <!-- Status Field -->
+                <div>
+                    {{ form_label(form.status, 'Order Status', {
+                        'label_attr': {
+                            'class': 'block text-sm font-semibold text-yellow-300 mb-2'
+                        }
+                    }) }}
+                    
+                    {{ form_widget(form.status, {
+                        'attr': {
+                            'class': 'w-full px-4 py-3.5 bg-gray-800/50 border border-gray-700 rounded-xl 
+                                     text-white focus:outline-none focus:ring-2 focus:ring-yellow-500 
+                                     focus:border-yellow-500 transition duration-200 hover:border-gray-600 text-base'
+                        }
+                    }) }}
+                    
+                    {% if form.status.vars.errors|length > 0 %}
+                        <div class="mt-2 text-sm text-red-400 space-y-1">
+                            {{ form_errors(form.status) }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Notes Field -->
+                <div>
+                    {{ form_label(form.notes, 'Order Notes', {
+                        'label_attr': {
+                            'class': 'block text-sm font-semibold text-yellow-300 mb-2'
+                        }
+                    }) }}
+                    
+                    {{ form_widget(form.notes, {
+                        'attr': {
+                            'class': 'w-full px-4 py-3.5 bg-gray-800/50 border border-gray-700 rounded-xl 
+                                     text-white placeholder-gray-500 focus:outline-none focus:ring-2 
+                                     focus:ring-yellow-500 focus:border-yellow-500 transition duration-200
+                                     hover:border-gray-600 resize-y min-h-[120px] text-base',
+                            'rows': 4,
+                            'placeholder': 'Add any special instructions or notes for this order...'
+                        }
+                    }) }}
+                    
+                    {% if form.notes.vars.errors|length > 0 %}
+                        <div class="mt-2 text-sm text-red-400 space-y-1">
+                            {{ form_errors(form.notes) }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Hidden fields for form structure -->
+                <input type="hidden" id="items-count" name="items-count" value="0">
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4 mt-12 pt-8 border-t border-gray-700/50">
+                    <!-- Submit Button -->
+                    <button type="submit"
+                            class="group inline-flex items-center justify-center gap-3 px-8 py-4 text-base font-bold 
+                                   bg-gradient-to-r from-yellow-600 to-yellow-700 text-black rounded-xl
+                                   hover:from-yellow-500 hover:to-yellow-600 active:scale-[0.98]
+                                   shadow-lg hover:shadow-xl shadow-yellow-900/30
+                                   border border-yellow-800/30 transition-all duration-200
+                                   focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-gray-900
+                                   flex-1 sm:flex-none min-h-[52px]">
+                        
+                        <svg class="w-5 h-5 transition-transform group-hover:scale-110" 
+                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        
+                        <span>{{ button_label|default('Create Order') }}</span>
+                    </button>
+
+                    <!-- Cancel Button -->
+                    <a href="{{ path('app_order_index') }}"
+                       class="inline-flex items-center justify-center gap-3 px-8 py-4 text-base font-semibold
+                              bg-gray-800/60 text-gray-300 rounded-xl hover:bg-gray-800 hover:text-white
+                              active:scale-[0.98] border border-gray-700/50 transition-all duration-200
+                              focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-900
+                              flex-1 sm:flex-none min-h-[52px]">
+                        
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                        
+                        <span>Cancel</span>
+                    </a>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+
+    <!-- Quick Tips Section -->
+    <div class="mt-8 bg-blue-900/10 backdrop-blur-sm rounded-2xl border border-blue-800/30 shadow-xl p-6 md:p-8">
+        <div class="flex items-start gap-4">
+            <svg class="w-6 h-6 text-blue-400 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <div>
+                <h3 class="text-lg font-semibold text-blue-300 mb-3">Tips for creating orders</h3>
+                <ul class="text-gray-400 space-y-2 text-sm">
+                    <li class="flex items-start gap-2">
+                        <span class="text-blue-400">•</span>
+                        <span>Select the correct customer to associate with this order</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-blue-400">•</span>
+                        <span>Add products by clicking "Add First Item" or "Add Another Item"</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-blue-400">•</span>
+                        <span>Set appropriate order status based on current processing stage</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-blue-400">•</span>
+                        <span>Use notes for special instructions, delivery preferences, or customer requests</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let itemCount = 0;
+    
+    // Add first item
+    document.getElementById('add-first-item').addEventListener('click', function() {
+        addItem();
+        this.style.display = 'none';
+        document.getElementById('add-item').classList.remove('hidden');
+    });
+    
+    // Add another item
+    document.getElementById('add-item').addEventListener('click', function() {
+        addItem();
+    });
+    
+    function addItem() {
+        const template = document.getElementById('item-template').innerHTML;
+        const newHtml = template.replace(/__index__/g, itemCount);
+        
+        const div = document.createElement('div');
+        div.innerHTML = newHtml;
+        const newItem = div.firstElementChild;
+        document.getElementById('order-items').appendChild(newItem);
+        
+        // Add event listeners
+        const productSelect = newItem.querySelector('.product-select');
+        const quantityInput = newItem.querySelector('.quantity-input');
+        const removeBtn = newItem.querySelector('.remove-item');
+        
+        productSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const price = selectedOption.dataset.price || '0';
+            const unitPriceInput = this.closest('.order-item').querySelector('.unit-price-input');
+            unitPriceInput.value = parseFloat(price).toFixed(2);
+            calculateTotal();
+        });
+        
+        quantityInput.addEventListener('input', function() {
+            // Ensure minimum value
+            if (this.value < 1) {
+                this.value = 1;
+            }
+            calculateTotal();
+        });
+        
+        quantityInput.addEventListener('change', calculateTotal);
+        
+        removeBtn.addEventListener('click', function() {
+            const item = this.closest('.order-item');
+            if (item) {
+                item.remove();
+                calculateTotal();
+                
+                // Show first button if no items
+                if (document.querySelectorAll('.order-item').length === 0) {
+                    document.getElementById('add-first-item').style.display = 'inline-flex';
+                    document.getElementById('add-item').classList.add('hidden');
+                }
+            }
+        });
+        
+        itemCount++;
+        document.getElementById('items-count').value = itemCount;
+        calculateTotal();
+    }
+    
+    function calculateTotal() {
+        let total = 0;
+        document.querySelectorAll('.order-item').forEach(item => {
+            const quantity = parseFloat(item.querySelector('.quantity-input').value) || 0;
+            const price = parseFloat(item.querySelector('.unit-price-input').value) || 0;
+            total += quantity * price;
+        });
+        document.getElementById('order-total').textContent = total.toFixed(2);
+    }
+    
+    // Form submission validation
+    document.getElementById('order-form').addEventListener('submit', function(e) {
+        const items = document.querySelectorAll('.order-item');
+        if (items.length === 0) {
+            e.preventDefault();
+            alert('Please add at least one item to the order.');
+            return false;
+        }
+        
+        // Check each item has a product selected
+        let hasValidItem = false;
+        items.forEach(item => {
+            const productSelect = item.querySelector('.product-select');
+            if (productSelect && productSelect.value) {
+                hasValidItem = true;
+            }
+        });
+        
+        if (!hasValidItem) {
+            e.preventDefault();
+            alert('Please select a product for at least one item.');
+            return false;
+        }
+        
+        return true;
+    });
+});
+</script>
+{% endblock %}

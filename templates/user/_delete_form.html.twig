@@ -1,0 +1,125 @@
+{# user/_delete_form.html.twig #}
+<form method="post" 
+      action="{{ path('app_user_delete', {'id': user.id}) }}" 
+      onsubmit="return confirm('Are you sure you want to delete this user? This action cannot be undone.');"
+      class="bg-gradient-to-br from-red-50/10 to-red-900/5 dark:from-red-950/20 dark:to-gray-900/30
+             border border-red-200 dark:border-red-800/40 
+             rounded-2xl md:rounded-3xl p-5 md:p-8
+             shadow-lg hover:shadow-xl shadow-red-100/50 dark:shadow-red-900/20
+             transition-all duration-300 hover:border-red-300 dark:hover:border-red-700/60
+             backdrop-blur-sm">
+
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+    
+    <div class="space-y-6 md:space-y-8">
+        <!-- Warning Header -->
+        <div class="flex items-start gap-4">
+            <!-- Warning Icon -->
+            <div class="flex-shrink-0 p-3 rounded-xl bg-red-100/80 dark:bg-red-900/30
+                        ring-2 ring-red-200/60 dark:ring-red-800/30">
+                <svg class="w-6 h-6 md:w-7 md:h-7 text-red-600 dark:text-red-400" 
+                     fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" 
+                          d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                          clip-rule="evenodd"/>
+                </svg>
+            </div>
+
+            <!-- Warning Content -->
+            <div class="flex-1 pt-1">
+                <h3 class="text-lg md:text-xl font-bold bg-gradient-to-r from-red-700 to-red-800 dark:from-red-400 dark:to-red-300 
+                           bg-clip-text text-transparent">
+                    Delete User Account
+                </h3>
+                <div class="mt-3 space-y-2">
+                    <p class="text-gray-700 dark:text-gray-300 text-sm md:text-base leading-relaxed">
+                        Deleting this user account will permanently remove:
+                    </p>
+                    <ul class="space-y-1.5 pl-4">
+                        <li class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                            <svg class="w-4 h-4 text-red-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>User profile and personal information</span>
+                        </li>
+                        <li class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                            <svg class="w-4 h-4 text-red-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>Account access and permissions</span>
+                        </li>
+                        <li class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                            <svg class="w-4 h-4 text-red-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>All associated data and activity history</span>
+                        </li>
+                    </ul>
+                    <p class="mt-3 text-sm font-medium text-red-600 dark:text-red-400">
+                        ⚠️ This action cannot be undone. Please proceed with caution.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="border-t border-red-200/50 dark:border-red-800/30"></div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col-reverse sm:flex-row gap-4 sm:gap-6">
+            <!-- Cancel/Back Button (Optional - if you want a cancel option) -->
+            <button type="button"
+                    onclick="window.history.back()"
+                    class="group flex-1 sm:flex-none inline-flex items-center justify-center gap-3 
+                           px-6 py-3.5 text-sm font-semibold 
+                           bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl
+                           hover:bg-gray-200 dark:hover:bg-gray-700 active:scale-[0.99]
+                           border border-gray-300 dark:border-gray-700 transition-all duration-200
+                           focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900
+                           min-h-[52px]">
+                
+                <svg class="w-4 h-4 transition-transform group-hover:-translate-x-0.5" 
+                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                
+                <span>Go Back</span>
+            </button>
+
+            <!-- Delete Button -->
+            <button type="submit"
+                    class="group flex-1 sm:flex-none inline-flex items-center justify-center gap-3 
+                           px-8 py-3.5 text-sm font-bold 
+                           bg-gradient-to-r from-red-600 via-red-700 to-red-800 
+                           text-white rounded-xl
+                           hover:from-red-500 hover:via-red-600 hover:to-red-700 
+                           active:scale-[0.98] transform-gpu
+                           shadow-lg hover:shadow-xl shadow-red-500/30 dark:shadow-red-900/40
+                           border border-red-700 dark:border-red-800 transition-all duration-200
+                           focus:outline-none focus:ring-4 focus:ring-red-400/40 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900
+                           min-h-[52px]"
+                    aria-label="Permanently delete user account">
+                
+                <svg class="w-5 h-5 transition-all group-hover:scale-110 group-hover:rotate-12" 
+                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+                
+                <span class="relative">
+                    Delete User
+                    <span class="absolute -bottom-1 left-0 w-full h-0.5 bg-white/40 scale-x-0 
+                                group-hover:scale-x-100 transition-transform duration-300"></span>
+                </span>
+            </button>
+        </div>
+
+        <!-- Additional Warning Note -->
+        <div class="text-center">
+            <p class="text-xs text-gray-500 dark:text-gray-500 italic">
+                Note: System administrators will be notified of this action.
+            </p>
+        </div>
+    </div>
+</form>

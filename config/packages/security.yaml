@@ -18,6 +18,26 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         
+        api_login:
+            pattern: ^/api/login
+            stateless: true
+            json_login:
+                check_path: /api/login
+                username_path: email
+                password_path: password
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+
+        api_register: 
+            pattern: ^/api/register
+            stateless: true
+            security: false
+        
+        api: 
+            pattern: ^/api
+            stateless: true
+            jwt: ~
+
         main:
             lazy: true
             provider: app_user_provider
@@ -28,30 +48,40 @@ security:
                 target: app_login
 
     access_control:
-        # ========== PUBLIC ROUTES (no login required) ==========
+
+        # ========== API ROUTES ========== #
+        - { path: ^/api/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/me, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api/register, roles: PUBLIC_ACCESS }
+        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+
+        # ========== PUBLIC ROUTES (no login required) ========== #
         - { path: ^/$, roles: PUBLIC_ACCESS }
         - { path: ^/login$, roles: PUBLIC_ACCESS }
         - { path: ^/register$, roles: PUBLIC_ACCESS }
-        
-        # ========== ADMIN-ONLY ROUTES ==========
+        - { path: ^/verify-email, roles: PUBLIC_ACCESS }
+        - { path: ^/resend-verification, roles: PUBLIC_ACCESS }
+
+        # ========== ADMIN-ONLY ROUTES ========== #
         # Staff CANNOT access these at all
         - { path: ^/admin, roles: ROLE_ADMIN }                # Admin dashboard
         - { path: ^/user, roles: ROLE_ADMIN }                 # User management
         - { path: ^/activity-log, roles: ROLE_ADMIN }         # Activity logs
         
-        # ========== STAFF & ADMIN ROUTES ==========
+        # ========== STAFF & ADMIN ROUTES ========== #
         # Both Admin and Staff can access these (CRUD operations)
         - { path: ^/category, roles: [ROLE_ADMIN, ROLE_STAFF] }  # Category management
         - { path: ^/customer, roles: [ROLE_ADMIN, ROLE_STAFF] }  # Customer management
         - { path: ^/order, roles: [ROLE_ADMIN, ROLE_STAFF] }     # Order management
         - { path: ^/product, roles: [ROLE_ADMIN, ROLE_STAFF] }   # Product management
-        
-        # ========== ALL LOGGED IN USERS ==========
+        - { path: ^/stock, roles: [ROLE_ADMIN, ROLE_STAFF] }     # Stock management
+
+        # ========== ALL LOGGED IN USERS ========== #
         - { path: ^/dashboard, roles: ROLE_USER }
         - { path: ^/profile, roles: ROLE_USER }
         - { path: ^/staff/dashboard, roles: ROLE_STAFF }
         
-        # ========== FALLBACK - Require authentication for everything else ==========
+        # ========== FALLBACK - Require authentication for everything else ========== #
         - { path: ^/, roles: ROLE_USER }
 
 when@test:

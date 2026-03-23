@@ -58,6 +58,15 @@ class Product
     #[ORM\OneToMany(targetEntity: OrderItem::class, mappedBy: 'product')]
     private Collection $orderItems;
 
+    #[ORM\Column]
+    private ?int $stockQuantity = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $minimumStock = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTime $lastStockUpdate = null;
+
     public function __construct()
     {
         $this->createdAt = new \DateTime();
@@ -167,6 +176,42 @@ class Product
                 $orderItem->setProduct(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getStockQuantity(): ?int
+    {
+        return $this->stockQuantity;
+    }
+
+    public function setStockQuantity(int $stockQuantity): static
+    {
+        $this->stockQuantity = $stockQuantity;
+
+        return $this;
+    }
+
+    public function getMinimumStock(): ?int
+    {
+        return $this->minimumStock;
+    }
+
+    public function setMinimumStock(?int $minimumStock): static
+    {
+        $this->minimumStock = $minimumStock;
+
+        return $this;
+    }
+
+    public function getLastStockUpdate(): ?\DateTime
+    {
+        return $this->lastStockUpdate;
+    }
+
+    public function setLastStockUpdate(?\DateTime $lastStockUpdate): static
+    {
+        $this->lastStockUpdate = $lastStockUpdate;
 
         return $this;
     }

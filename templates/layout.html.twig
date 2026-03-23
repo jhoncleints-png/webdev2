@@ -4,7 +4,7 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    <style>
+    <style> 
         /* Animation for sidebar elements */
         @keyframes slideIn {
             from {
@@ -458,6 +458,12 @@
                        data-route="app_order_index">
                         <span>📦</span>
                         <span>Orders</span>
+                    </a>
+                    <a href="{{ path('app_stock_index') }}" 
+                       class="nav-link {% if app.request.get('_route') == 'app_stock_index' %}active{% endif %}"
+                       data-route="app_stock_index">
+                        <span>📊</span>
+                        <span>Stock</span>
                     </a>
                 </div>
                 {% endif %}

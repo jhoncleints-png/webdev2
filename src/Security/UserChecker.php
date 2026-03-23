@@ -15,7 +15,7 @@ class UserChecker implements UserCheckerInterface
             return;
         }
 
-        // Check if user is enabled (using your isEnabled() method)
+        // Check if user is enabled
         if (!$user->isEnabled()) {
             throw new CustomUserMessageAccountStatusException(
                 'Your account has been disabled. Please contact an administrator.'
@@ -25,6 +25,17 @@ class UserChecker implements UserCheckerInterface
 
     public function checkPostAuth(UserInterface $user): void
     {
-        // You can add post-authentication checks here if needed
+        if (!$user instanceof User) {
+            return;
+        }
+
+        // Check if email is verified
+        if (!$user->isVerified()) {
+            throw new CustomUserMessageAccountStatusException(
+                'Please verify your email address before logging in. ' .
+                '<a href="/resend-verification?email=' . $user->getEmail() . '" style="color: #f5e56b; text-decoration: underline;">' .
+                'Resend verification email</a>'
+            );
+        }
     }
 }

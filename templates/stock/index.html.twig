@@ -1,0 +1,237 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Stock Management - Samaco Brewery{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    
+    <style>
+        .dataTables_paginate .paginate_button {
+            display: inline-block !important;
+            margin: 0 2px !important;
+        }
+
+        .dataTables_paginate {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            justify-content: flex-end !important;
+            align-items: center !important;
+            gap: 4px !important;
+        }
+
+        .dataTables_info {
+            display: flex !important;
+            align-items: center !important;
+        }
+        
+        /* Stock status badge colors */
+        .stock-in-stock {
+            background-color: rgba(34, 197, 94, 0.2) !important;
+            color: #4ade80 !important;
+            border-color: rgba(34, 197, 94, 0.5) !important;
+        }
+        
+        .stock-low-stock {
+            background-color: rgba(234, 179, 8, 0.2) !important;
+            color: #facc15 !important;
+            border-color: rgba(234, 179, 8, 0.5) !important;
+        }
+        
+        .stock-out-of-stock {
+            background-color: rgba(239, 68, 68, 0.2) !important;
+            color: #f87171 !important;
+            border-color: rgba(239, 68, 68, 0.5) !important;
+        }
+    </style>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Page Header -->
+    <div class="bg-gradient-to-r from-black to-gray-900 rounded-lg border-l-4 border-yellow-500 p-6 mb-6 shadow-lg">
+        <h1 class="text-3xl font-bold text-yellow-500 mb-1">📊 Stock Management</h1>
+        <p class="text-gray-400">Track and manage product inventory levels</p>
+    </div>
+
+    <!-- Top Actions -->
+    <div class="mb-4 flex gap-3">
+        <a href="{{ path('app_stock_low') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition duration-200">
+            <span>⚠️</span>
+            <span>Low Stock Alerts</span>
+        </a>
+        <a href="{{ path('app_product_index') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg transition duration-200">
+            <span>🍺</span>
+            <span>Back to Products</span>
+        </a>
+    </div>
+
+    <!-- Advanced Filters -->
+    <div class="bg-gray-800/80 rounded-lg border border-yellow-500/15 p-5 mb-6 shadow-lg">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div>
+                <label for="searchProduct" class="block text-yellow-500 text-sm font-semibold mb-2">Product Name</label>
+                <input type="text" id="searchProduct" class="w-full px-3 py-2 bg-gray-700 border border-yellow-500/30 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-yellow-500" placeholder="Search by product...">
+            </div>
+            
+            <div>
+                <label for="searchCategory" class="block text-yellow-500 text-sm font-semibold mb-2">Category</label>
+                <input type="text" id="searchCategory" class="w-full px-3 py-2 bg-gray-700 border border-yellow-500/30 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-yellow-500" placeholder="Search by category...">
+            </div>
+            
+            <div>
+                <label for="filterStatus" class="block text-yellow-500 text-sm font-semibold mb-2">Stock Status</label>
+                <select id="filterStatus" class="w-full px-3 py-2 bg-gray-700 border border-yellow-500/30 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                    <option value="">All Status</option>
+                    <option value="In Stock">In Stock</option>
+                    <option value="Low Stock">Low Stock</option>
+                    <option value="Out of Stock">Out of Stock</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <button id="resetFilters" class="px-5 py-2 bg-gray-700 text-gray-400 border border-gray-500 rounded-md font-semibold hover:bg-gray-600 hover:text-white transition-all duration-200">
+                Reset All Filters
+            </button>
+        </div>
+    </div>
+
+    <!-- Stock Table -->
+    <div class="bg-gray-800/80 rounded-lg shadow-lg p-6">
+        {% if products is empty %}
+            <div class="text-center py-12">
+                <div class="text-5xl mb-3 opacity-60">📦</div>
+                <h3 class="text-yellow-500 text-xl mb-2">No Products Found</h3>
+                <p class="text-yellow-500/70">Create products to start managing stock</p>
+                <a href="{{ path('app_product_new') }}" class="inline-flex items-center gap-2 px-6 py-3 mt-4 bg-gradient-to-r from-yellow-500 to-yellow-300 text-black font-semibold rounded-lg hover:scale-105 transition duration-200">
+                    <span>+</span>
+                    <span>Create Product</span>
+                </a>
+            </div>
+        {% else %}
+            <table id="stockTable" class="display w-full">
+                <thead>
+                    <tr class="bg-yellow-500/15">
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-yellow-500 uppercase tracking-wider">Product</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-yellow-500 uppercase tracking-wider">Category</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-yellow-500 uppercase tracking-wider">Current Stock</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-yellow-500 uppercase tracking-wider">Min Stock</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-yellow-500 uppercase tracking-wider">Status</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-yellow-500 uppercase tracking-wider">Last Updated</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-yellow-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                        {% set isLowStock = product.minimumStock is not null and product.stockQuantity <= product.minimumStock %}
+                        {% set isOutOfStock = product.stockQuantity == 0 %}
+                        <tr class="border-b border-gray-700 hover:bg-yellow-500/10 transition-colors">
+                            <td class="px-4 py-3 text-sm text-white font-medium">{{ product.name }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-300">{{ product.category.name ?? 'Uncategorized' }}</td>
+                            <td class="px-4 py-3 text-sm {% if isLowStock %}text-yellow-500 font-bold{% elseif isOutOfStock %}text-red-500 font-bold{% else %}text-green-500 font-bold{% endif %}">
+                                {{ product.stockQuantity }}
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-300">{{ product.minimumStock ?? 'Not set' }}</td>
+                            <td class="px-4 py-3">
+                                {% if isOutOfStock %}
+                                    <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold border stock-out-of-stock">
+                                        Out of Stock
+                                    </span>
+                                {% elseif isLowStock %}
+                                    <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold border stock-low-stock">
+                                        Low Stock
+                                    </span>
+                                {% else %}
+                                    <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold border stock-in-stock">
+                                        In Stock
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-400">{{ product.lastStockUpdate ? product.lastStockUpdate|date('Y-m-d H:i') : 'Never' }}</td>
+                            <td class="px-4 py-3">
+                                <a href="{{ path('app_stock_adjust', {'id': product.id}) }}" class="inline-flex items-center gap-1 px-3 py-1.5 bg-yellow-900/30 text-yellow-300 border border-yellow-500/50 rounded-md text-xs font-semibold hover:bg-yellow-900/50 transition">
+                                    📦 Adjust Stock
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if ($('#stockTable').length && !$.fn.DataTable.isDataTable('#stockTable')) {
+                window.stockTable = $('#stockTable').DataTable({
+                    paging: true,
+                    pageLength: 10,
+                    lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+                    searching: true,
+                    ordering: true,
+                    order: [[2, 'desc']],
+                    responsive: true,
+                    autoWidth: false,
+                    language: {
+                        search: "Search:",
+                        searchPlaceholder: "Type to search...",
+                        lengthMenu: "Show _MENU_ entries",
+                        info: "Showing _START_ to _END_ of _TOTAL_ products",
+                        infoEmpty: "Showing 0 to 0 of 0 products",
+                        infoFiltered: "(filtered from _MAX_ total products)",
+                        zeroRecords: "No matching products found",
+                        paginate: {
+                            first: "« First",
+                            last: "Last »",
+                            next: "Next →",
+                            previous: "← Previous"
+                        }
+                    },
+                    dom: '<"flex flex-wrap justify-between items-center mb-4"l<"ml-auto"f>>rt<"flex flex-wrap justify-between items-center mt-4"ip>',
+                });
+                
+                // Filters
+                $('#searchProduct').on('keyup', function() {
+                    window.stockTable.column(0).search(this.value).draw();
+                });
+                
+                $('#searchCategory').on('keyup', function() {
+                    window.stockTable.column(1).search(this.value).draw();
+                });
+                
+                $('#filterStatus').on('change', function() {
+                    var statusFilter = this.value;
+                    if (window.stockTable) {
+                        if (statusFilter) {
+                            window.stockTable.column(4).search(statusFilter, false, false).draw();
+                        } else {
+                            window.stockTable.column(4).search('').draw();
+                        }
+                    }
+                });
+                
+                $('#resetFilters').on('click', function() {
+                    $('#searchProduct').val('');
+                    $('#searchCategory').val('');
+                    $('#filterStatus').val('');
+                    if (window.stockTable) {
+                        window.stockTable.search('');
+                        window.stockTable.columns().search('');
+                        window.stockTable.draw();
+                    }
+                });
+            }
+        });
+    </script>
+{% endblock %}

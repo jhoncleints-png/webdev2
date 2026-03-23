@@ -2,27 +2,33 @@
 module.exports = {
   content: [
     './templates/**/*.twig',
-    './assets/**/*.js'
+    './templates/**/*.html.twig',
+    './assets/**/*.js',
+    './src/**/*.php',
   ],
   theme: {
     extend: {
       colors: {
-        primary: '#F2B705',
-        secondary: '#1F1F1F',
-        tertiary: '#ffffff',
+        yellow: {
+          500: '#F2B705',
+          400: '#F3C107',
+          300: '#F5CB2A',
+        },
+        gray: {
+          800: '#1F1F1F',
+          900: '#0A0A0A',
+          700: '#2D2D2D',
+          600: '#3D3D3D',
+          500: '#4D4D4D',
+          400: '#6B6B6B',
+          300: '#8B8B8B',
+        },
       },
       fontFamily: {
-        header: ['Poppins', 'sans-serif'],
-        body: ['Libre Baskerville', 'serif'],
-      },
-      backdropBlur: {
-        xs: '2px',
-        sm: '4px',
-        md: '8px',
-        lg: '12px',
-        xl: '20px',
+        'poppins': ['Poppins', 'sans-serif'],
+        'baskerville': ['Libre Baskerville', 'serif'],
       },
     },
   },
   plugins: [],
-};
+}

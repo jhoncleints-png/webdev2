@@ -5,7 +5,9 @@ namespace App\Form;
 use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\IsTrue;
@@ -17,7 +19,49 @@ class RegistrationFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('email')
+            ->add('email', EmailType::class, [
+                'attr' => [
+                    'autocomplete' => 'email',
+                    'placeholder' => 'Enter your email'
+                ],
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'Please enter your email address',
+                    ]),
+                ],
+            ])
+            ->add('firstName', TextType::class, [
+                'attr' => [
+                    'autocomplete' => 'given-name',
+                    'placeholder' => 'Enter your first name'
+                ],
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'First name is required.',
+                    ]),
+                    new Length([
+                        'min' => 2,
+                        'minMessage' => 'Your first name should be at least {{ limit }} characters',
+                        'max' => 100,
+                    ]),
+                ],
+            ])
+            ->add('lastName', TextType::class, [
+                'attr' => [
+                    'autocomplete' => 'family-name',
+                    'placeholder' => 'Enter your last name'
+                ],
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'Last name is required.',
+                    ]),
+                    new Length([
+                        'min' => 2,
+                        'minMessage' => 'Your last name should be at least {{ limit }} characters',
+                        'max' => 100,
+                    ]),
+                ],
+            ])
             ->add('agreeTerms', CheckboxType::class, [
                 'mapped' => false,
                 'constraints' => [

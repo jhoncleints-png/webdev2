@@ -4,93 +4,25 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    <style> 
-        /* Animation for sidebar elements */
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .nav-link {
-            animation: slideIn 0.3s ease-out forwards;
-            opacity: 0;
-        }
-
-        .nav-link:nth-child(1) { animation-delay: 0.1s; }
-        .nav-link:nth-child(2) { animation-delay: 0.15s; }
-        .nav-link:nth-child(3) { animation-delay: 0.2s; }
-        .nav-link:nth-child(4) { animation-delay: 0.25s; }
-        .nav-link:nth-child(5) { animation-delay: 0.3s; }
-        .nav-link:nth-child(6) { animation-delay: 0.35s; }
-        .nav-link:nth-child(7) { animation-delay: 0.4s; }
-        .nav-link:nth-child(8) { animation-delay: 0.45s; }
-
-        .nav-link::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.15), transparent);
-            transition: left 0.5s ease;
-            z-index: 1;
-        }
-
-        .nav-link:hover::before {
-            left: 100%;
-        }
-
-        .nav-link:hover {
-            background: linear-gradient(90deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05));
-            color: #FFD700;
-            transform: translateX(5px);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .nav-link.active {
-            background: linear-gradient(90deg, rgba(255, 215, 0, 0.25), rgba(255, 215, 0, 0.15));
-            color: #FFD700;
-            border-left: 3px solid #FFD700;
-            box-shadow: inset 0 0 15px rgba(255, 215, 0, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Ensure the text stays above the shine effect */
-        .nav-link > span {
-            position: relative;
-            z-index: 2;
-        }
-        
-        /* Mobile menu toggle button (hidden on desktop) */
+    <style>
+        /* Mobile menu toggle */
         .mobile-menu-toggle {
             display: none;
             position: fixed;
             top: 15px;
             left: 15px;
-            z-index: 1000;
+            z-index: 1001;
             background: #000;
             border: 2px solid #FFD700;
             color: #FFD700;
-            padding: 8px 12px;
-            border-radius: 6px;
+            padding: 10px 15px;
+            border-radius: 8px;
             cursor: pointer;
-            font-weight: 600;
-        }
-        
-        .mobile-menu-toggle span {
             font-size: 24px;
+            font-weight: bold;
         }
         
-        /* Sidebar - Fixed position, NO SCROLLING */
+        /* Sidebar */
         .sidebar-container {
             background: linear-gradient(180deg, #000000 0%, #1a1a1a 100%);
             border-right: 3px solid #FFD700;
@@ -98,12 +30,31 @@
             position: fixed;
             top: 0;
             left: 0;
-            width: 256px;
+            width: 280px;
             height: 100vh;
             display: flex;
             flex-direction: column;
-            z-index: 999;
+            z-index: 1000;
             overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        
+        /* Mobile state - hidden by default */
+        @media (max-width: 1024px) {
+            .sidebar-container {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar-container.mobile-open {
+                transform: translateX(0);
+            }
+        }
+        
+        /* Desktop - always visible */
+        @media (min-width: 1025px) {
+            .sidebar-container {
+                transform: translateX(0) !important;
+            }
         }
         
         .sidebar-container::before {
@@ -117,16 +68,14 @@
             z-index: 10;
         }
         
-        /* Main sidebar content */
         .sidebar-content {
             flex: 1;
             display: flex;
             flex-direction: column;
             padding: 0.75rem;
-            overflow: hidden;
+            overflow-y: auto;
         }
         
-        /* Logo container - smaller */
         .logo-container {
             background: linear-gradient(145deg, #FFD700 0%, #FFC107 100%);
             padding: 0.75rem;
@@ -142,14 +91,11 @@
             margin: 0 auto;
         }
         
-        /* Navigation sections container - compact */
         .nav-sections-container {
             flex: 1;
-            overflow: hidden;
             margin-bottom: 0.5rem;
         }
         
-        /* User section - very compact */
         .user-section {
             background: rgba(255, 215, 0, 0.1);
             border-radius: 8px;
@@ -159,18 +105,12 @@
             flex-shrink: 0;
         }
         
-        /* REMOVED SECTION TITLES - to save space */
         .nav-title {
-            display: none; /* Hide the titles */
+            display: none;
         }
         
-        /* Even more compact navigation */
         .nav-section {
             margin-bottom: 0.75rem;
-        }
-        
-        .nav-section:last-of-type {
-            margin-bottom: 0.25rem;
         }
         
         .nav-link {
@@ -184,20 +124,55 @@
             text-decoration: none;
             transition: all 0.2s ease;
             font-size: 0.85rem;
+            position: relative;
+            overflow: hidden;
+            animation: slideIn 0.3s ease-out forwards;
+            opacity: 0;
+        }
+        
+        .nav-link:nth-child(1) { animation-delay: 0.1s; }
+        .nav-link:nth-child(2) { animation-delay: 0.15s; }
+        .nav-link:nth-child(3) { animation-delay: 0.2s; }
+        .nav-link:nth-child(4) { animation-delay: 0.25s; }
+        .nav-link:nth-child(5) { animation-delay: 0.3s; }
+        .nav-link:nth-child(6) { animation-delay: 0.35s; }
+        .nav-link:nth-child(7) { animation-delay: 0.4s; }
+        .nav-link:nth-child(8) { animation-delay: 0.45s; }
+        
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.15), transparent);
+            transition: left 0.5s ease;
+            z-index: 1;
+        }
+        
+        .nav-link:hover::before {
+            left: 100%;
         }
         
         .nav-link:hover {
-            background: rgba(255, 215, 0, 0.15);
+            background: linear-gradient(90deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05));
             color: #FFD700;
+            transform: translateX(5px);
         }
         
         .nav-link.active {
-            background: rgba(255, 215, 0, 0.25);
+            background: linear-gradient(90deg, rgba(255, 215, 0, 0.25), rgba(255, 215, 0, 0.15));
             color: #FFD700;
-            border-left: 2px solid #FFD700;
+            border-left: 3px solid #FFD700;
+            box-shadow: inset 0 0 15px rgba(255, 215, 0, 0.1);
         }
         
-        /* Super compact user info */
+        .nav-link > span {
+            position: relative;
+            z-index: 2;
+        }
+        
         .user-info {
             display: flex;
             align-items: center;
@@ -219,11 +194,6 @@
             font-weight: bold;
             font-size: 0.9rem;
             flex-shrink: 0;
-        }
-        
-        .user-details {
-            flex: 1;
-            min-width: 0;
         }
         
         .user-email {
@@ -258,14 +228,12 @@
             color: #ffc107;
         }
         
-        /* Make user links even smaller */
         .user-section .nav-link {
             padding: 0.5rem 0.75rem;
             font-size: 0.8rem;
             margin: 0.1rem 0;
         }
         
-        /* Overlay for mobile */
         .sidebar-overlay {
             display: none;
             position: fixed;
@@ -273,55 +241,43 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 998;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 999;
         }
         
-        /* Main content - scrolls independently */
+        .sidebar-overlay.active {
+            display: block;
+        }
+        
         main {
-            margin-left: 256px;
+            margin-left: 280px;
             background: #f8f9fa;
             min-height: 100vh;
-            overflow-y: auto;
             padding: 1.5rem;
         }
         
-        /* MOBILE STYLES */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
         @media (max-width: 1024px) {
-            /* Show mobile toggle button */
             .mobile-menu-toggle {
                 display: block;
             }
             
-            /* Sidebar as mobile drawer */
-            .sidebar-container {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 280px;
-                height: 100vh;
-                transform: translateX(-100%);
-                border-right: none;
-            }
-            
-            .sidebar-container.active {
-                transform: translateX(0);
-            }
-            
-            /* Show overlay when sidebar is open */
-            .sidebar-overlay.active {
-                display: block;
-            }
-            
-            /* Adjust main content */
             main {
                 margin-left: 0 !important;
                 padding: 20px;
                 padding-top: 70px;
-                width: 100%;
             }
             
-            /* Show titles on mobile for better UX */
             .nav-title {
                 display: block;
                 color: #FFD700;
@@ -333,161 +289,95 @@
                 padding: 0 0.75rem;
             }
             
-            /* Slightly larger on mobile */
             .nav-link {
                 font-size: 0.9rem;
                 padding: 0.75rem;
             }
             
-            .user-email {
-                font-size: 0.8rem;
-            }
-            
-            /* Adjust logo size */
             .logo-container {
                 margin: 15px;
                 padding: 1rem;
             }
-            
-            .logo-img {
-                max-width: 140px;
-            }
         }
         
-        /* SMALL PHONES */
         @media (max-width: 480px) {
             .sidebar-container {
                 width: 100%;
-            }
-            
-            .mobile-menu-toggle {
-                top: 10px;
-                left: 10px;
-                padding: 6px 10px;
             }
             
             main {
                 padding: 15px;
                 padding-top: 60px;
             }
-            
-            .nav-link {
-                font-size: 0.95rem;
-                padding: 0.85rem;
-            }
-            
-            .user-section {
-                margin: 0.75rem;
-                padding: 1rem;
-            }
-        }
-        
-        /* TABLET */
-        @media (min-width: 769px) and (max-width: 1024px) {
-            .sidebar-container {
-                width: 240px;
-            }
-            
-            main {
-                margin-left: 240px;
-            }
-            
-            .logo-img {
-                max-width: 130px;
-            }
         }
     </style>
 {% endblock %}
 
 {% block body %}
-<!-- Mobile Menu Toggle Button -->
 <button class="mobile-menu-toggle" id="mobileToggle">
-    <span>☰</span>
+    ☰
 </button>
 
-<!-- Sidebar Overlay (Mobile Only) -->
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 <div class="min-h-screen">
-    <!-- Sidebar - Fixed/sticky sidebar -->
     <aside class="sidebar-container" id="sidebar">
-        <!-- Sidebar Content - Simple, no scrolling -->
         <div class="sidebar-content">
-            <!-- Logo -->
             <div class="logo-container">
-                <img 
-                    src="{{ asset('images/logo.png') }}" 
-                    alt="Samaco Brewery Logo"
-                    class="logo-img"
-                >
+                <img src="{{ asset('images/logo.png') }}" alt="Samaco Brewery Logo" class="logo-img">
             </div>
             
-            <!-- Navigation Sections - No scrolling, no titles -->
             <div class="nav-sections-container">
-                <!-- Main Navigation -->
                 <div class="nav-section">
-                    <!-- Title removed on desktop -->
                     <div class="nav-title">Dashboard</div>
                     <a href="{{ path('app_dashboard_home') }}" 
-                       class="nav-link {% if app.request.get('_route') == 'app_dashboard_home' %}active{% endif %}"
-                       data-route="app_dashboard_home">
+                       class="nav-link {% if app.request.get('_route') == 'app_dashboard_home' %}active{% endif %}">
                         <span>🏠</span>
                         <span>Home</span>
                     </a>
                 </div>
 
-                <!-- Brewery Management - BOTH ADMIN AND STAFF -->
                 {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
                 <div class="nav-section">
-                    <!-- Title removed on desktop -->
                     <div class="nav-title">Brewery Management</div>
                     <a href="{{ path('app_product_index') }}" 
-                       class="nav-link {% if app.request.get('_route') == 'app_product_index' %}active{% endif %}"
-                       data-route="app_product_index">
+                       class="nav-link {% if app.request.get('_route') == 'app_product_index' %}active{% endif %}">
                         <span>🍺</span>
                         <span>Products</span>
                     </a>
                     <a href="{{ path('app_customer_index') }}" 
-                       class="nav-link {% if app.request.get('_route') == 'app_customer_index' %}active{% endif %}"
-                       data-route="app_customer_index">
+                       class="nav-link {% if app.request.get('_route') == 'app_customer_index' %}active{% endif %}">
                         <span>👥</span>
                         <span>Customers</span>
                     </a>
                     <a href="{{ path('app_order_index') }}" 
-                       class="nav-link {% if app.request.get('_route') == 'app_order_index' %}active{% endif %}"
-                       data-route="app_order_index">
+                       class="nav-link {% if app.request.get('_route') == 'app_order_index' %}active{% endif %}">
                         <span>📦</span>
                         <span>Orders</span>
                     </a>
                     <a href="{{ path('app_stock_index') }}" 
-                       class="nav-link {% if app.request.get('_route') == 'app_stock_index' %}active{% endif %}"
-                       data-route="app_stock_index">
+                       class="nav-link {% if app.request.get('_route') == 'app_stock_index' %}active{% endif %}">
                         <span>📊</span>
                         <span>Stock</span>
                     </a>
                 </div>
                 {% endif %}
 
-                <!-- Admin Only Sections -->
                 {% if is_granted('ROLE_ADMIN') %}
                 <div class="nav-section">
-                    <!-- Title removed on desktop -->
                     <div class="nav-title">System Administration</div>
                     <a href="{{ path('app_category_index') }}" 
-                       class="nav-link {% if app.request.get('_route') == 'app_category_index' %}active{% endif %}"
-                       data-route="app_category_index">
+                       class="nav-link {% if app.request.get('_route') == 'app_category_index' %}active{% endif %}">
                         <span>🏷️</span>
                         <span>Categories</span>
                     </a>
                     <a href="{{ path('app_user_index') }}" 
-                       class="nav-link {% if app.request.get('_route') == 'app_user_index' %}active{% endif %}"
-                       data-route="app_user_index">
+                       class="nav-link {% if app.request.get('_route') == 'app_user_index' %}active{% endif %}">
                         <span>👨‍💼</span>
                         <span>Manage Users</span>
                     </a>
                     <a href="{{ path('app_activity_log_index') }}" 
-                       class="nav-link {% if app.request.get('_route') == 'app_activity_log_index' %}active{% endif %}"
-                       data-route="app_activity_log_index">
+                       class="nav-link {% if app.request.get('_route') == 'app_activity_log_index' %}active{% endif %}">
                         <span>📊</span>
                         <span>Activity Logs</span>
                     </a>
@@ -495,12 +385,9 @@
                 {% endif %}
             </div>
 
-            <!-- User Section - Compact at bottom -->
             <div class="user-section">
                 <div class="user-info">
-                    <div class="user-avatar">
-                        {{ app.user.email|first|upper }}
-                    </div>
+                    <div class="user-avatar">{{ app.user.email|first|upper }}</div>
                     <div class="user-details">
                         <span class="user-email">{{ app.user.email }}</span>
                         {% if is_granted('ROLE_ADMIN') %}
@@ -514,15 +401,11 @@
                 </div>
                 
                 <div>
-                    <a href="{{ path('app_profile_index') }}" 
-                       class="nav-link"
-                       data-route="app_profile_index">
+                    <a href="{{ path('app_profile_index') }}" class="nav-link">
                         <span>👤</span>
                         <span>My Profile</span>
                     </a>
-                    <a href="{{ path('app_logout') }}" 
-                       class="nav-link"
-                       data-route="app_logout">
+                    <a href="{{ path('app_logout') }}" class="nav-link">
                         <span>🚪</span>
                         <span>Logout</span>
                     </a>
@@ -531,94 +414,78 @@
         </div>
     </aside>
 
-    <!-- Main Content - Scrolls independently -->
     <main>
-        {% block dashboard_content %}
-        {% endblock %}
+        {% block dashboard_content %}{% endblock %}
     </main>
 </div>
 
 {% block javascripts %}
     {{ parent() }}
     <script>
-        // Mobile menu functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const sidebar = document.getElementById('sidebar');
-            const mobileToggle = document.getElementById('mobileToggle');
-            const sidebarOverlay = document.getElementById('sidebarOverlay');
-            
-            // Toggle sidebar on mobile
-            function toggleSidebar() {
-                sidebar.classList.toggle('active');
-                sidebarOverlay.classList.toggle('active');
-            }
-            
-            // Add event listeners
-            if (mobileToggle) {
-                mobileToggle.addEventListener('click', toggleSidebar);
-            }
-            
-            if (sidebarOverlay) {
-                sidebarOverlay.addEventListener('click', toggleSidebar);
-            }
-            
-            // Close sidebar when clicking on a link (mobile only)
-            if (window.innerWidth <= 1024) {
-                const navLinks = document.querySelectorAll('.nav-link');
-                navLinks.forEach(link => {
-                    link.addEventListener('click', function() {
-                        sidebar.classList.remove('active');
-                        sidebarOverlay.classList.remove('active');
-                    });
-                });
-            }
-            
-            // Active link detection
-            const currentPath = window.location.pathname;
-            const navLinks = document.querySelectorAll('.nav-link');
-            
-            // First, remove all active classes
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-            });
-            
-            // Then add active class to the correct link
-            navLinks.forEach(link => {
-                const href = link.getAttribute('href');
-                if (href) {
-                    // Check if this is the current page
-                    if (currentPath === href || 
-                        (currentPath.startsWith(href) && href !== '/' && href !== '')) {
-                        link.classList.add('active');
+        (function() {
+            // Wait for DOM to be ready
+            function init() {
+                var sidebar = document.getElementById('sidebar');
+                var toggle = document.getElementById('mobileToggle');
+                var overlay = document.getElementById('sidebarOverlay');
+                
+                // console.log('Sidebar found:', sidebar);
+                // console.log('Toggle found:', toggle);
+                // console.log('Overlay found:', overlay);
+                
+                if (!sidebar || !toggle) {
+                    console.error('Missing elements!');
+                    return;
+                }
+                
+                function openSidebar() {
+                    sidebar.classList.add('mobile-open');
+                    if (overlay) overlay.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                    //console.log('Sidebar opened');
+                }
+                
+                function closeSidebar() {
+                    sidebar.classList.remove('mobile-open');
+                    if (overlay) overlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                    //console.log('Sidebar closed');
+                }
+                
+                // Toggle function
+                toggle.onclick = function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    //console.log('Toggle clicked!');
+                    if (sidebar.classList.contains('mobile-open')) {
+                        closeSidebar();
+                    } else {
+                        openSidebar();
                     }
+                };
+                
+                // Overlay click
+                if (overlay) {
+                    overlay.onclick = function() {
+                        closeSidebar();
+                    };
                 }
-            });
-            
-            // Close sidebar on escape key
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && sidebar.classList.contains('active')) {
-                    toggleSidebar();
-                }
-            });
-            
-            // Adjust sidebar on window resize
-            function handleResize() {
-                if (window.innerWidth > 1024) {
-                    // Desktop: always show sidebar
-                    sidebar.classList.add('active');
-                    sidebarOverlay.classList.remove('active');
-                } else {
-                    // Mobile: hide sidebar by default
-                    sidebar.classList.remove('active');
-                }
+                
+                // Close on escape key
+                document.onkeydown = function(e) {
+                    if (e.key === 'Escape' && sidebar.classList.contains('mobile-open')) {
+                        closeSidebar();
+                    }
+                };
             }
             
-            // Initial check
-            handleResize();
-            
-            // Listen for resize
-            window.addEventListener('resize', handleResize);
-        });
+            // Run when DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
     </script>
 {% endblock %}
 {% endblock %}

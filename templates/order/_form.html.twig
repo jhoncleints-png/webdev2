@@ -1,176 +1,234 @@
 {{ form_start(form, {'attr': {'class': 'space-y-8'}}) }}
     
-    <!-- Customer Field with your styling -->
-    <div>
-        {{ form_label(form.customer, 'Customer', {
-            'label_attr': {
-                'class': 'block text-sm font-semibold text-yellow-300 mb-2'
-            }
-        }) }}
+    <!-- Form Container -->
+    <div class="bg-gray-900/80 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-2xl p-6 md:p-8">
         
-        {{ form_widget(form.customer, {
-            'attr': {
-                'class': 'w-full px-4 py-3.5 bg-gray-800/50 border border-gray-700 rounded-xl 
-                         text-white placeholder-gray-500 focus:outline-none focus:ring-2 
-                         focus:ring-yellow-500 focus:border-yellow-500 transition duration-200
-                         hover:border-gray-600 text-base'
-            }
-        }) }}
-    </div>
+        <!-- Form Header -->
+        <div class="mb-8">
+            <h2 class="text-2xl md:text-3xl font-bold text-yellow-400 mb-2">
+                {{ button_label|default('Update Order') }}
+            </h2>
+            <p class="text-gray-400">Manage order details and items</p>
+        </div>
 
-    <!-- Order Items Section with styling -->
-    {% if form.orderItems is defined %}
-    <div class="bg-gray-800/30 rounded-2xl border border-gray-700/30 p-6">
-        <h3 class="text-xl font-bold text-yellow-400 mb-6">Order Items</h3>
-        
-        <div id="order-items" class="space-y-4">
-            {% for item in form.orderItems %}
-            <div class="order-item bg-gray-900/50 border border-gray-700/50 rounded-xl p-4">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        {{ form_label(item.product, 'Product', {
-                            'label_attr': {
-                                'class': 'block text-sm font-medium text-gray-300 mb-2'
-                            }
-                        }) }}
-                        
-                        {{ form_widget(item.product, {
-                            'attr': {
-                                'class': 'w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg 
-                                         text-white focus:outline-none focus:ring-2 focus:ring-yellow-500 
-                                         focus:border-yellow-500 transition duration-200'
-                            }
-                        }) }}
+        <!-- Form Fields Container -->
+        <div class="space-y-8">
+            
+            <!-- Customer Field - matches product name styling -->
+            <div>
+                {{ form_label(form.customer, 'Customer', {
+                    'label_attr': {
+                        'class': 'block text-sm font-semibold text-yellow-300 mb-2'
+                    }
+                }) }}
+                
+                {{ form_widget(form.customer, {
+                    'attr': {
+                        'class': 'w-full px-4 py-3.5 bg-gray-800/50 border border-gray-700 rounded-xl 
+                                 text-white placeholder-gray-500 focus:outline-none focus:ring-2 
+                                 focus:ring-yellow-500 focus:border-yellow-500 transition duration-200
+                                 hover:border-gray-600 text-base'
+                    }
+                }) }}
+                
+                {{ form_errors(form.customer) }}
+            </div>
+
+            <!-- Order Items Section -->
+            {% if form.orderItems is defined %}
+            <div class="space-y-6">
+                <div class="border-b border-gray-700/50 pb-2">
+                    <h3 class="text-xl font-bold text-yellow-400">Order Items</h3>
+                    <p class="text-sm text-gray-500 mt-1">Add or modify products in this order</p>
+                </div>
+                
+                <div id="order-items" class="space-y-4">
+                    {% for item in form.orderItems %}
+                    <div class="order-item bg-gray-800/30 border border-gray-700/50 rounded-xl p-4 md:p-5 transition-all hover:border-gray-600">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <!-- Product Field -->
+                            <div>
+                                {{ form_label(item.product, 'Product', {
+                                    'label_attr': {
+                                        'class': 'block text-sm font-semibold text-yellow-300 mb-2'
+                                    }
+                                }) }}
+                                
+                                {{ form_widget(item.product, {
+                                    'attr': {
+                                        'class': 'w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl 
+                                                 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500 
+                                                 focus:border-yellow-500 transition duration-200 hover:border-gray-600'
+                                    }
+                                }) }}
+                                
+                                {{ form_errors(item.product) }}
+                            </div>
+                            
+                            <!-- Quantity Field -->
+                            <div>
+                                {{ form_label(item.quantity, 'Quantity', {
+                                    'label_attr': {
+                                        'class': 'block text-sm font-semibold text-yellow-300 mb-2'
+                                    }
+                                }) }}
+                                
+                                {{ form_widget(item.quantity, {
+                                    'attr': {
+                                        'class': 'w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl 
+                                                 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500 
+                                                 focus:border-yellow-500 transition duration-200 hover:border-gray-600',
+                                        'min': '1',
+                                        'placeholder': 'Quantity'
+                                    }
+                                }) }}
+                                
+                                {{ form_errors(item.quantity) }}
+                            </div>
+                            
+                            <!-- Unit Price Field (readonly) -->
+                            <div>
+                                {{ form_label(item.unitPrice, 'Unit Price', {
+                                    'label_attr': {
+                                        'class': 'block text-sm font-semibold text-yellow-300 mb-2'
+                                    }
+                                }) }}
+                                
+                                {{ form_widget(item.unitPrice, {
+                                    'attr': {
+                                        'class': 'w-full px-4 py-3 bg-gray-800/30 border border-gray-700/50 rounded-xl 
+                                                 text-gray-300 cursor-not-allowed',
+                                        'readonly': 'readonly'
+                                    }
+                                }) }}
+                                
+                                {{ form_errors(item.unitPrice) }}
+                            </div>
+                        </div>
                     </div>
-                    
-                    <div>
-                        {{ form_label(item.quantity, 'Quantity', {
-                            'label_attr': {
-                                'class': 'block text-sm font-medium text-gray-300 mb-2'
-                            }
-                        }) }}
-                        
-                        {{ form_widget(item.quantity, {
-                            'attr': {
-                                'class': 'w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg 
-                                         text-white focus:outline-none focus:ring-2 focus:ring-yellow-500 
-                                         focus:border-yellow-500 transition duration-200',
-                                'min': '1'
-                            }
-                        }) }}
-                    </div>
-                    
-                    <div>
-                        {{ form_label(item.unitPrice, 'Unit Price', {
-                            'label_attr': {
-                                'class': 'block text-sm font-medium text-gray-300 mb-2'
-                            }
-                        }) }}
-                        
-                        {{ form_widget(item.unitPrice, {
-                            'attr': {
-                                'class': 'w-full px-4 py-3 bg-gray-800/30 border border-gray-700 rounded-lg 
-                                         text-gray-300 cursor-not-allowed',
-                                'readonly': 'readonly'
-                            }
-                        }) }}
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
-            {% endfor %}
+            {% endif %}
+
+            <!-- Status Field -->
+            <div>
+                {{ form_label(form.status, 'Order Status', {
+                    'label_attr': {
+                        'class': 'block text-sm font-semibold text-yellow-300 mb-2'
+                    }
+                }) }}
+                
+                {{ form_widget(form.status, {
+                    'attr': {
+                        'class': 'w-full px-4 py-3.5 bg-gray-800/50 border border-gray-700 rounded-xl 
+                                 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500 
+                                 focus:border-yellow-500 transition duration-200 hover:border-gray-600 text-base'
+                    }
+                }) }}
+                
+                {{ form_errors(form.status) }}
+            </div>
+
+            <!-- Notes Field -->
+            <div>
+                {{ form_label(form.notes, 'Order Notes', {
+                    'label_attr': {
+                        'class': 'block text-sm font-semibold text-yellow-300 mb-2'
+                    }
+                }) }}
+                
+                {{ form_widget(form.notes, {
+                    'attr': {
+                        'class': 'w-full px-4 py-3.5 bg-gray-800/50 border border-gray-700 rounded-xl 
+                                 text-white placeholder-gray-500 focus:outline-none focus:ring-2 
+                                 focus:ring-yellow-500 focus:border-yellow-500 transition duration-200
+                                 hover:border-gray-600 resize-y min-h-[120px] text-base',
+                        'rows': 4,
+                        'placeholder': 'Add any special instructions or notes for this order...'
+                    }
+                }) }}
+                
+                {{ form_errors(form.notes) }}
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 mt-12 pt-8 border-t border-gray-700/50">
+            <!-- Submit Button -->
+            <button type="submit"
+                    class="group inline-flex items-center justify-center gap-3 px-8 py-4 text-base font-bold 
+                        bg-yellow-500 text-black rounded-xl
+                        hover:bg-yellow-400 active:scale-[0.98]
+                        shadow-lg hover:shadow-xl shadow-yellow-500/25
+                        transition-all duration-200
+                        focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-gray-900
+                        flex-1 sm:flex-none min-h-[52px]">
+
+                <svg class="w-5 h-5 transition-transform group-hover:scale-110"
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M5 13l4 4L19 7"></path>
+                </svg>
+
+                <span>{{ button_label|default('Update Order') }}</span>
+            </button>
+
+            <!-- Cancel Button -->
+            <a href="{{ path('app_order_index') }}"
+                class="inline-flex items-center justify-center gap-3 px-8 py-4 text-base font-semibold
+                        bg-gray-600 text-white rounded-xl hover:bg-gray-500 hover:text-white
+                        active:scale-[0.98] border border-gray-500/50 transition-all duration-200
+                        focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-900
+                        flex-1 sm:flex-none min-h-[52px]">
+                
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                        d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+                
+                <span>Cancel</span>
+            </a>
         </div>
     </div>
-    {% endif %}
-
-    <!-- Status Field -->
-    <div>
-        {{ form_label(form.status, 'Order Status', {
-            'label_attr': {
-                'class': 'block text-sm font-semibold text-yellow-300 mb-2'
-            }
-        }) }}
-        
-        {{ form_widget(form.status, {
-            'attr': {
-                'class': 'w-full px-4 py-3.5 bg-gray-800/50 border border-gray-700 rounded-xl 
-                         text-white focus:outline-none focus:ring-2 focus:ring-yellow-500 
-                         focus:border-yellow-500 transition duration-200 hover:border-gray-600 text-base'
-            }
-        }) }}
-    </div>
-
-    <!-- Notes Field -->
-    <div>
-        {{ form_label(form.notes, 'Order Notes', {
-            'label_attr': {
-                'class': 'block text-sm font-semibold text-yellow-300 mb-2'
-            }
-        }) }}
-        
-        {{ form_widget(form.notes, {
-            'attr': {
-                'class': 'w-full px-4 py-3.5 bg-gray-800/50 border border-gray-700 rounded-xl 
-                         text-white placeholder-gray-500 focus:outline-none focus:ring-2 
-                         focus:ring-yellow-500 focus:border-yellow-500 transition duration-200
-                         hover:border-gray-600 resize-y min-h-[120px] text-base',
-                'rows': 4,
-                'placeholder': 'Add any special instructions or notes for this order...'
-            }
-        }) }}
-    </div>
-
-    <!-- Action Buttons -->
-<div class="flex flex-col sm:flex-row gap-4 mt-12 pt-8 border-t border-gray-700/50">
-    <!-- Submit Button -->
-    <button type="submit"
-            class="group inline-flex items-center justify-center gap-3 px-8 py-4 text-base font-bold 
-                   bg-gradient-to-r from-yellow-600 to-yellow-700 text-black rounded-xl
-                   hover:from-yellow-500 hover:to-yellow-600 active:scale-[0.98]
-                   shadow-lg hover:shadow-xl shadow-yellow-900/30
-                   border border-yellow-800/30 transition-all duration-200
-                   focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-gray-900
-                   flex-1 sm:flex-none min-h-[52px]">
-        
-        <svg class="w-5 h-5 transition-transform group-hover:scale-110" 
-             fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                  d="M5 13l4 4L19 7"></path>
-        </svg>
-        
-        <span>{{ button_label|default('Update Order') }}</span>
-    </button>
-
-    <!-- Cancel Button -->
-    <a href="{{ path('app_order_index') }}"
-       class="inline-flex items-center justify-center gap-3 px-8 py-4 text-base font-semibold
-              bg-gray-800/60 text-gray-300 rounded-xl hover:bg-gray-800 hover:text-white
-              active:scale-[0.98] border border-gray-700/50 transition-all duration-200
-              focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-900
-              flex-1 sm:flex-none min-h-[52px]">
-        
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                  d="M6 18L18 6M6 6l12 12"></path>
-        </svg>
-        
-        <span>Cancel</span>
-    </a>
-</div>
 
 {{ form_end(form) }}
 
+<!-- JavaScript for auto-updating unit price based on selected product -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Add event listeners for product selection to update unit price
-    document.querySelectorAll('.order-item select').forEach(select => {
+    // Find all product select dropdowns within order items
+    const productSelects = document.querySelectorAll('.order-item select[id$="_product"]');
+    
+    productSelects.forEach(select => {
         select.addEventListener('change', function() {
             const selectedOption = this.options[this.selectedIndex];
-            const price = selectedOption.getAttribute('data-price') || '0';
-            const unitPriceInput = this.closest('.order-item').querySelector('input[name$="[unitPrice]"]');
+            // Try to get price from data-price attribute, fallback to data attribute on option or text parsing
+            let price = selectedOption.getAttribute('data-price');
+            
+            // If no data-price, try to get from the option's text (if it contains price in parentheses)
+            if (!price) {
+                const optionText = selectedOption.text;
+                const priceMatch = optionText.match(/\(([\d.]+)\)/);
+                if (priceMatch) {
+                    price = priceMatch[1];
+                }
+            }
+            
+            // Fallback to 0 if no price found
+            price = price || '0';
+            
+            // Find the unit price input in the same order-item container
+            const orderItem = this.closest('.order-item');
+            const unitPriceInput = orderItem.querySelector('input[id$="_unitPrice"]');
+            
             if (unitPriceInput) {
                 unitPriceInput.value = parseFloat(price).toFixed(2);
             }
         });
+        
+        // Trigger change event on page load to set initial unit prices
+        select.dispatchEvent(new Event('change'));
     });
 });
 </script>

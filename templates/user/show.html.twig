@@ -5,7 +5,6 @@
 {% block dashboard_content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
     
-    <!-- Page Header -->
     <div class="mb-8">
         <nav class="flex items-center gap-2 text-sm text-gray-400 mb-6">
             <a href="{{ path('app_dashboard_home') }}" class="hover:text-yellow-400 transition-colors duration-200">Dashboard</a>
@@ -18,268 +17,188 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <h1 class="text-3xl md:text-4xl font-bold text-white mb-2 flex items-center gap-3">
-                    <div class="w-12 h-12 flex items-center justify-center bg-yellow-900/30 rounded-xl border border-yellow-800/30">
-                        <svg class="w-7 h-7 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                        </svg>
-                    </div>
+                    <svg class="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
                     {{ user.fullName }}
                 </h1>
-                <p class="text-gray-400 ml-14">User Profile Details</p>
+                <p class="text-gray-400 ml-11">User Profile Details</p>
             </div>
             
             <a href="{{ path('app_user_index') }}"
-               class="inline-flex items-center gap-2 px-5 py-3 text-sm font-semibold text-gray-300 
-                      bg-gray-800/50 rounded-xl hover:bg-gray-800 hover:text-white transition-all duration-200
-                      border border-gray-700/50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-900
-                      self-start sm:self-center">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+               class="inline-flex items-center gap-2 px-5 py-3 text-sm font-semibold text-white 
+                      bg-gray-700 rounded-xl hover:bg-gray-600 hover:text-white transition-all duration-200
+                      border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-gray-900
+                      self-start sm:self-center shadow-md">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
                 Back to Users
             </a>
         </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="space-y-8">
+    <!-- Single Grey Outer Box -->
+    <div class="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-xl p-6 md:p-8">
         
         <!-- User Details Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-            <!-- ID Card -->
-            <div class="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-xl p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+            <div class="bg-gray-900 rounded-xl border border-gray-700 p-6">
                 <div class="flex items-center gap-4 mb-4">
                     <div class="w-12 h-12 flex items-center justify-center bg-blue-900/30 rounded-xl border border-blue-800/30">
                         <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                     </div>
-                    <h3 class="text-lg font-semibold text-gray-300">User ID</h3>
+                    <h3 class="text-lg font-semibold text-white">User ID</h3>
                 </div>
                 <p class="text-3xl font-bold text-yellow-400">#{{ user.id }}</p>
-                <p class="text-sm text-gray-500 mt-2">Unique identifier</p>
+                <p class="text-sm text-white mt-2">Unique identifier</p>
             </div>
             
-            <!-- Role Card -->
-            <div class="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-xl p-6">
+            <div class="bg-gray-900 rounded-xl border border-gray-700 p-6">
                 <div class="flex items-center gap-4 mb-4">
                     <div class="w-12 h-12 flex items-center justify-center bg-purple-900/30 rounded-xl border border-purple-800/30">
                         <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
                         </svg>
                     </div>
-                    <h3 class="text-lg font-semibold text-gray-300">Role</h3>
+                    <h3 class="text-lg font-semibold text-white">Role</h3>
                 </div>
-                <div class="space-y-2">
+                <div class="flex flex-wrap gap-2">
                     {% for role in user.roles %}
                         {% if role == 'ROLE_ADMIN' %}
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-900/30 text-purple-300 border border-purple-700/50">
-                                Administrator
-                            </span>
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-900/30 text-purple-300 border border-purple-700/50">Administrator</span>
                         {% elseif role == 'ROLE_USER' %}
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-900/30 text-yellow-300 border border-yellow-700/50">
-                                Standard User
-                            </span>
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-900/30 text-yellow-300 border border-yellow-700/50">Standard User</span>
                         {% else %}
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-800 text-gray-300 border border-gray-700">
-                                {{ role }}
-                            </span>
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-800 text-gray-300 border border-gray-700">{{ role }}</span>
                         {% endif %}
                     {% endfor %}
                 </div>
-                <p class="text-sm text-gray-500 mt-2">User permissions level</p>
+                <p class="text-sm text-white mt-2">User permissions level</p>
             </div>
             
-            <!-- Account Status Card -->
-            <div class="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-xl p-6">
+            <div class="bg-gray-900 rounded-xl border border-gray-700 p-6">
                 <div class="flex items-center gap-4 mb-4">
                     <div class="w-12 h-12 flex items-center justify-center bg-green-900/30 rounded-xl border border-green-800/30">
                         <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
                         </svg>
                     </div>
-                    <h3 class="text-lg font-semibold text-gray-300">Status</h3>
+                    <h3 class="text-lg font-semibold text-white">Status</h3>
                 </div>
                 <div class="flex items-center gap-2">
-                    <div class="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
+                    <div class="w-3 h-3 rounded-full bg-green-500"></div>
                     <span class="text-xl font-bold text-green-400">Active</span>
                 </div>
-                <p class="text-sm text-gray-500 mt-2">Account status</p>
+                <p class="text-sm text-white mt-2">Account status</p>
             </div>
             
-            <!-- Created Date Card -->
-            <div class="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-xl p-6">
+            <div class="bg-gray-900 rounded-xl border border-gray-700 p-6">
                 <div class="flex items-center gap-4 mb-4">
                     <div class="w-12 h-12 flex items-center justify-center bg-indigo-900/30 rounded-xl border border-indigo-800/30">
                         <svg class="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                     </div>
-                    <h3 class="text-lg font-semibold text-gray-300">Member Since</h3>
+                    <h3 class="text-lg font-semibold text-white">Member Since</h3>
                 </div>
-                <div class="space-y-1">
-                    <p class="text-lg font-medium text-white">{{ user.createdAt|date('M d, Y') }}</p>
-                    <p class="text-sm text-gray-400">{{ user.createdAt|date('h:i A') }}</p>
-                </div>
-                <p class="text-sm text-gray-500 mt-2">Registration date</p>
+                <p class="text-lg font-medium text-white">{{ user.createdAt|date('M d, Y') }}</p>
+                <p class="text-sm text-white mt-2">Registration date</p>
             </div>
             
-            <!-- Last Updated Card -->
-            <div class="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-xl p-6">
+            <div class="bg-gray-900 rounded-xl border border-gray-700 p-6">
                 <div class="flex items-center gap-4 mb-4">
                     <div class="w-12 h-12 flex items-center justify-center bg-teal-900/30 rounded-xl border border-teal-800/30">
                         <svg class="w-6 h-6 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                     </div>
-                    <h3 class="text-lg font-semibold text-gray-300">Last Updated</h3>
+                    <h3 class="text-lg font-semibold text-white">Last Updated</h3>
                 </div>
-                <div class="space-y-1">
-                    {% if user.updatedAt %}
-                        <p class="text-lg font-medium text-white">{{ user.updatedAt|date('M d, Y') }}</p>
-                        <p class="text-sm text-gray-400">{{ user.updatedAt|date('h:i A') }}</p>
-                    {% else %}
-                        <p class="text-gray-400 italic">Not updated yet</p>
-                    {% endif %}
-                </div>
-                <p class="text-sm text-gray-500 mt-2">Profile last modified</p>
+                {% if user.updatedAt %}
+                    <p class="text-lg font-medium text-white">{{ user.updatedAt|date('M d, Y') }}</p>
+                {% else %}
+                    <p class="text-gray-400 italic">Not updated yet</p>
+                {% endif %}
+                <p class="text-sm text-white mt-2">Profile last modified</p>
             </div>
         </div>
 
-        <!-- User Information Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Personal Information Card -->
-            <div class="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-xl p-6 lg:col-span-2">
-                <div class="flex items-center gap-4 mb-4">
-                    <div class="w-12 h-12 flex items-center justify-center bg-yellow-900/30 rounded-xl border border-yellow-800/30">
-                        <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-semibold text-gray-300">Personal Information</h3>
+        <!-- Personal Information Section -->
+        <div class="bg-gray-900 rounded-xl border border-gray-700 p-6 mb-8">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-12 h-12 flex items-center justify-center bg-yellow-900/30 rounded-xl border border-yellow-800/30">
+                    <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Email -->
-                    <div class="bg-gray-800/30 rounded-xl p-4 border border-gray-700/30">
-                        <p class="text-sm text-gray-400 mb-1">Email Address</p>
-                        <div class="flex items-center gap-2">
-                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                            </svg>
-                            <p class="text-lg font-medium text-white truncate">{{ user.email }}</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Name -->
-                    <div class="bg-gray-800/30 rounded-xl p-4 border border-gray-700/30">
-                        <p class="text-sm text-gray-400 mb-1">Full Name</p>
-                        <div class="flex items-center gap-2">
-                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                            </svg>
-                            <p class="text-lg font-medium text-white">{{ user.fullName }}</p>
-                        </div>
-                    </div>
-                    
-                    <!-- First Name -->
-                    <div class="bg-gray-800/30 rounded-xl p-4 border border-gray-700/30">
-                        <p class="text-sm text-gray-400 mb-1">First Name</p>
-                        <p class="text-lg font-medium text-white">{{ user.firstName ?? 'Not specified' }}</p>
-                    </div>
-                    
-                    <!-- Last Name -->
-                    <div class="bg-gray-800/30 rounded-xl p-4 border border-gray-700/30">
-                        <p class="text-sm text-gray-400 mb-1">Last Name</p>
-                        <p class="text-lg font-medium text-white">{{ user.lastName ?? 'Not specified' }}</p>
-                    </div>
-                </div>
-                <p class="text-sm text-gray-500 mt-4">Contact and identification details</p>
+                <h3 class="text-lg font-semibold text-white">Personal Information</h3>
             </div>
-
-            <!-- Account Statistics Card -->
-            <div class="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-xl p-6">
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="w-12 h-12 flex items-center justify-center bg-blue-900/30 rounded-xl border border-blue-800/30">
-                        <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-semibold text-gray-300">Account Statistics</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
+                    <p class="text-sm text-gray-400 mb-1">Email Address</p>
+                    <p class="text-white font-medium">{{ user.email }}</p>
                 </div>
-                <div class="space-y-4">
-                    <!-- Products Created -->
-                    <div class="bg-gray-800/30 rounded-xl p-4 border border-gray-700/30">
-                        <p class="text-sm text-gray-400 mb-1">Products Created</p>
-                        <p class="text-2xl font-bold text-yellow-400">0</p>
-                        <p class="text-xs text-gray-500 mt-1">Total products created by this user</p>
-                    </div>
-                    
-                    <!-- Last Login -->
-                    <div class="bg-gray-800/30 rounded-xl p-4 border border-gray-700/30">
-                        <p class="text-sm text-gray-400 mb-1">Last Login</p>
-                        <p class="text-lg font-medium text-white">Recently</p>
-                        <p class="text-xs text-gray-500 mt-1">Most recent account activity</p>
-                    </div>
+                <div class="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
+                    <p class="text-sm text-gray-400 mb-1">Full Name</p>
+                    <p class="text-white font-medium">{{ user.fullName }}</p>
                 </div>
-                <p class="text-sm text-gray-500 mt-4">User activity metrics</p>
+                <div class="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
+                    <p class="text-sm text-gray-400 mb-1">First Name</p>
+                    <p class="text-white font-medium">{{ user.firstName ?? 'Not specified' }}</p>
+                </div>
+                <div class="bg-gray-800/50 rounded-xl p-4 border border-gray-700">
+                    <p class="text-sm text-gray-400 mb-1">Last Name</p>
+                    <p class="text-white font-medium">{{ user.lastName ?? 'Not specified' }}</p>
+                </div>
             </div>
+            <p class="text-sm text-white mt-4">Contact and identification details</p>
         </div>
 
         <!-- Actions Section -->
-        <div class="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-xl p-6 md:p-8">
-            <div class="mb-6">
-                <h2 class="text-xl font-bold text-yellow-400 mb-2 flex items-center gap-3">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                              d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+        <div class="bg-gray-900 rounded-xl border border-gray-700 p-4 md:p-6">
+            <div class="mb-4">
+                <h2 class="text-lg font-bold text-yellow-400 mb-1 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                     </svg>
-                    User Management
+                    User Actions
                 </h2>
-                <p class="text-gray-400">Manage this user account</p>
+                <p class="text-gray-400 text-sm">Manage this user account</p>
             </div>
             
-            <div class="flex flex-col sm:flex-row gap-4">
-                <!-- Edit Button -->
+            <div class="flex flex-col sm:flex-row gap-3">
                 <a href="{{ path('app_user_edit', {'id': user.id}) }}"
-                   class="group inline-flex items-center justify-center gap-3 px-6 py-4 text-base font-semibold 
-                          bg-gradient-to-r from-yellow-600 to-yellow-700 text-black rounded-xl
-                          hover:from-yellow-500 hover:to-yellow-600 active:scale-[0.98]
-                          shadow-lg hover:shadow-xl shadow-yellow-900/30
-                          border border-yellow-800/30 transition-all duration-200
-                          focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-gray-900
-                          flex-1">
+                   class="group inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold 
+                          bg-yellow-500 text-black rounded-lg
+                          hover:bg-yellow-400 active:scale-[0.98]
+                          shadow-md hover:shadow-lg shadow-yellow-500/25
+                          transition-all duration-200
+                          focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-gray-900">
                     
-                    <svg class="w-5 h-5 transition-transform group-hover:scale-110" 
+                    <svg class="w-4 h-4 transition-transform group-hover:scale-110" 
                          fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                     </svg>
                     
                     <span>Edit User</span>
                 </a>
 
-                <!-- Delete Form (admin only or self-delete with restrictions) -->
                 {% if is_granted('ROLE_ADMIN') and user.id != app.user.id %}
-                <div class="flex-1">
+                <div>
                     {{ include('user/_delete_form.html.twig') }}
                 </div>
                 {% elseif is_granted('ROLE_ADMIN') and user.id == app.user.id %}
-                <div class="flex-1">
-                    <div class="bg-red-900/20 border border-red-800/30 rounded-xl p-4">
-                        <div class="flex items-center gap-3">
-                            <svg class="w-5 h-5 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.282 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                            </svg>
-                            <p class="text-sm text-gray-300">You cannot delete your own account while logged in.</p>
-                        </div>
+                <div class="bg-red-900/20 border border-red-800/30 rounded-lg p-3">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.282 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                        </svg>
+                        <p class="text-xs text-gray-300">You cannot delete your own account while logged in.</p>
                     </div>
                 </div>
                 {% endif %}
             </div>
         </div>
-
     </div>
 </div>
 {% endblock %}

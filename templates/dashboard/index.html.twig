@@ -1,803 +1,357 @@
 {% extends 'layout.html.twig' %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    <style>
-        /* Dashboard styles matching the sidebar design */
-        .dashboard-container {
-            min-height: calc(100vh - 120px);
-        }
-        
-        .page-header {
-            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
-            border-radius: 10px;
-            border-left: 4px solid #FFD700;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-        }
-        
-        .page-title {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: #FFD700;
-            margin-bottom: 0.5rem;
-        }
-        
-        .page-subtitle {
-            color: #94a3b8;
-            font-size: 1rem;
-        }
-        
-        /* Role Badge */
-        .role-badge {
-            display: inline-block;
-            padding: 0.3rem 1rem;
-            background: rgba(255, 215, 0, 0.15);
-            color: #FFD700;
-            font-size: 0.85rem;
-            border-radius: 15px;
-            font-weight: 600;
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            margin-left: 1rem;
-            vertical-align: middle;
-        }
-        
-        /* Cards Container */
-        .cards-grid {
-            display: grid;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        /* Stats Cards */
-        .stat-card {
-            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
-            border-radius: 8px;
-            padding: 1.25rem;
-            border: 1px solid rgba(255, 215, 0, 0.15);
-            transition: all 0.2s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .stat-card:hover {
-            border-color: rgba(255, 215, 0, 0.3);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.1);
-        }
-        
-        .stat-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 0.75rem;
-        }
-        
-        .stat-title {
-            color: #e2e8f0;
-            font-size: 0.95rem;
-            font-weight: 600;
-        }
-        
-        .stat-icon {
-            width: 40px;
-            height: 40px;
-            background: rgba(255, 215, 0, 0.1);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            color: #FFD700;
-            border: 1px solid rgba(255, 215, 0, 0.2);
-        }
-        
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #FFD700;
-            margin-bottom: 0.5rem;
-            line-height: 1;
-        }
-        
-        .stat-desc {
-            color: #94a3b8;
-            font-size: 0.85rem;
-            line-height: 1.4;
-        }
-        
-        /* Quick Actions Section */
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            padding-bottom: 0.75rem;
-            border-bottom: 1px solid rgba(255, 215, 0, 0.1);
-        }
-        
-        .section-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #FFD700;
-        }
-        
-        .actions-grid {
-            display: grid;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-        
-        .action-card {
-            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
-            border-radius: 8px;
-            padding: 1.5rem;
-            border: 1px solid rgba(255, 215, 0, 0.15);
-            transition: all 0.2s ease;
-            text-align: center;
-        }
-        
-        .action-card:hover {
-            border-color: rgba(255, 215, 0, 0.3);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.1);
-        }
-        
-        .action-icon {
-            width: 60px;
-            height: 60px;
-            background: rgba(255, 215, 0, 0.1);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.75rem;
-            color: #FFD700;
-            margin: 0 auto 1rem;
-            border: 1px solid rgba(255, 215, 0, 0.2);
-        }
-        
-        .action-title {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #e2e8f0;
-            margin-bottom: 0.5rem;
-        }
-        
-        .action-desc {
-            color: #94a3b8;
-            font-size: 0.85rem;
-            margin-bottom: 1rem;
-            line-height: 1.4;
-        }
-        
-        .action-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.6rem 1.25rem;
-            background: rgba(255, 215, 0, 0.15);
-            color: #FFD700;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            border: 1px solid rgba(255, 215, 0, 0.25);
-            transition: all 0.2s ease;
-            margin-top: 0.5rem;
-        }
-        
-        .action-btn:hover {
-            background: rgba(255, 215, 0, 0.25);
-            border-color: rgba(255, 215, 0, 0.4);
-            transform: translateY(-1px);
-        }
-        
-        /* Activity Logs Section */
-        .activity-section {
-            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
-            border-radius: 8px;
-            border: 1px solid rgba(255, 215, 0, 0.15);
-            overflow: hidden;
-            margin-bottom: 2rem;
-        }
-        
-        .activity-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        .activity-header-row {
-            background: rgba(255, 215, 0, 0.1);
-            border-bottom: 2px solid rgba(255, 215, 0, 0.2);
-        }
-        
-        .activity-header-cell {
-            padding: 1rem;
-            text-align: left;
-            color: #FFD700;
-            font-weight: 600;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .activity-row {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.2s ease;
-        }
-        
-        .activity-row:hover {
-            background: rgba(255, 215, 0, 0.05);
-        }
-        
-        .activity-cell {
-            padding: 0.875rem 1rem;
-            color: #e2e8f0;
-            font-size: 0.9rem;
-            vertical-align: middle;
-        }
-        
-        .user-cell {
-            color: #FFD700;
-            font-weight: 500;
-        }
-        
-        .role-cell {
-            display: inline-block;
-            padding: 0.2rem 0.6rem;
-            background: rgba(50, 205, 50, 0.15);
-            color: #32CD32;
-            font-size: 0.75rem;
-            border-radius: 10px;
-            border: 1px solid rgba(50, 205, 50, 0.3);
-        }
-        
-        .role-cell.admin {
-            background: rgba(220, 53, 69, 0.15);
-            color: #dc3545;
-            border-color: rgba(220, 53, 69, 0.3);
-        }
-        
-        .role-cell.staff {
-            background: rgba(255, 193, 7, 0.15);
-            color: #ffc107;
-            border-color: rgba(255, 193, 7, 0.3);
-        }
-        
-        .action-cell {
-            font-weight: 500;
-        }
-        
-        .action-cell.login { color: #10B981; }
-        .action-cell.logout { color: #EF4444; }
-        .action-cell.create { color: #3B82F6; }
-        .action-cell.update { color: #F59E0B; }
-        .action-cell.delete { color: #EF4444; }
-        
-        .timestamp-cell {
-            color: #94a3b8;
-            font-size: 0.85rem;
-        }
-        
-        /* System Status Section */
-        .status-section {
-            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
-            border-radius: 8px;
-            padding: 1.5rem;
-            border: 1px solid rgba(255, 215, 0, 0.15);
-            margin-bottom: 2rem;
-        }
-        
-        .status-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #FFD700;
-            margin-bottom: 1rem;
-        }
-        
-        .status-grid {
-            display: grid;
-            gap: 1rem;
-        }
-        
-        .status-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 6px;
-            border-left: 3px solid #FFD700;
-        }
-        
-        .status-label {
-            color: #e2e8f0;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-        
-        .status-value {
-            color: #FFD700;
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-        
-        .status-value.online { color: #10B981; }
-        .status-value.offline { color: #EF4444; }
-        .status-value.warning { color: #F59E0B; }
-        
-        /* Responsive Design - YES, it's fully responsive! */
-        @media (max-width: 768px) {
-            .dashboard-container {
-                min-height: calc(100vh - 100px);
-            }
-            
-            .page-header {
-                padding: 1.25rem;
-                margin-bottom: 1.25rem;
-            }
-            
-            .page-title {
-                font-size: 1.5rem;
-            }
-            
-            .role-badge {
-                margin-left: 0.5rem;
-                padding: 0.2rem 0.75rem;
-                font-size: 0.8rem;
-            }
-            
-            .stat-value {
-                font-size: 1.75rem;
-            }
-            
-            .stat-icon {
-                width: 35px;
-                height: 35px;
-                font-size: 1.1rem;
-            }
-            
-            .action-card {
-                padding: 1.25rem;
-            }
-            
-            .action-icon {
-                width: 50px;
-                height: 50px;
-                font-size: 1.5rem;
-            }
-            
-            /* Table becomes horizontally scrollable on mobile */
-            .activity-table {
-                display: block;
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-            }
-            
-            .activity-header-cell,
-            .activity-cell {
-                padding: 0.75rem;
-                font-size: 0.85rem;
-                white-space: nowrap;
-            }
-            
-            .activity-header-cell {
-                font-size: 0.8rem;
-                padding: 0.75rem 0.5rem;
-            }
-            
-            /* Adjust table columns for better mobile view */
-            .activity-table td:nth-child(4),
-            .activity-table th:nth-child(4) {
-                min-width: 200px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .page-header {
-                padding: 1rem;
-            }
-            
-            .page-title {
-                font-size: 1.25rem;
-            }
-            
-            .page-subtitle {
-                font-size: 0.9rem;
-            }
-            
-            .stat-card,
-            .action-card,
-            .status-section {
-                padding: 1rem;
-            }
-            
-            .stat-value {
-                font-size: 1.5rem;
-            }
-            
-            .stat-title {
-                font-size: 0.9rem;
-            }
-            
-            .stat-desc {
-                font-size: 0.8rem;
-            }
-            
-            .action-icon {
-                width: 45px;
-                height: 45px;
-                font-size: 1.25rem;
-            }
-            
-            .action-title {
-                font-size: 0.95rem;
-            }
-            
-            .action-desc {
-                font-size: 0.8rem;
-            }
-            
-            .action-btn {
-                padding: 0.5rem 1rem;
-                font-size: 0.85rem;
-            }
-            
-            .activity-cell {
-                padding: 0.75rem 0.5rem;
-                font-size: 0.8rem;
-            }
-            
-            .role-cell {
-                padding: 0.15rem 0.5rem;
-                font-size: 0.7rem;
-            }
-            
-            /* Hide less important table columns on very small screens */
-            .activity-table td:nth-child(4),
-            .activity-table th:nth-child(4) {
-                display: none;
-            }
-        }
-        
-        /* Grid layouts - responsive columns */
-        @media (min-width: 640px) {
-            .cards-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .actions-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .status-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        
-        @media (min-width: 768px) {
-            .cards-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-            
-            .actions-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-        
-        @media (min-width: 1024px) {
-            .cards-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-            
-            .actions-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-            
-            .status-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-        }
-    </style>
-{% endblock %}
+{% block title %}Dashboard - Samaco Brewery{% endblock %}
 
 {% block dashboard_content %}
-    <div class="dashboard-container">
-        <!-- Page Header -->
-        <div class="page-header">
-            <h1 class="page-title">
-                Brewery Dashboard
-                {% if is_granted('ROLE_ADMIN') %}
-                    <span class="role-badge">ADMIN</span>
-                {% elseif is_granted('ROLE_STAFF') %}
-                    <span class="role-badge">STAFF</span>
-                {% else %}
-                    <span class="role-badge">USER</span>
-                {% endif %}
-            </h1>
-            <p class="page-subtitle">Welcome back! Manage your brewery system with powerful tools and real-time insights.</p>
-        </div>
-
-        <!-- Stats Cards -->
-        <div class="cards-grid">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+    
+    <!-- Page Header -->
+    <div class="bg-gradient-to-r from-black to-gray-900 rounded-xl sm:rounded-2xl border-l-4 border-yellow-400 p-4 sm:p-6 mb-6 sm:mb-8 shadow-xl">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+                <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-yellow-400 mb-1">
+                    Brewery Dashboard
+                </h1>
+                <p class="text-gray-400 text-xs sm:text-sm">Welcome back! Manage your brewery system with powerful tools and real-time insights.</p>
+            </div>
             {% if is_granted('ROLE_ADMIN') %}
-            <!-- Total Users -->
-            <div class="stat-card">
-                <div class="stat-header">
-                    <h3 class="stat-title">Total Users</h3>
-                    <div class="stat-icon">👥</div>
-                </div>
-                <div class="stat-value">{{ user_count }}</div>
-                <p class="stat-desc">All registered users in the system</p>
-            </div>
-            
-            <!-- Staff Members -->
-            <div class="stat-card">
-                <div class="stat-header">
-                    <h3 class="stat-title">Staff Members</h3>
-                    <div class="stat-icon">👨‍💼</div>
-                </div>
-                <div class="stat-value">{{ staff_count }}</div>
-                <p class="stat-desc">Active staff accounts</p>
-            </div>
-            
-            <!-- Total Records -->
-            <div class="stat-card">
-                <div class="stat-header">
-                    <h3 class="stat-title">Total Records</h3>
-                    <div class="stat-icon">📊</div>
-                </div>
-                <div class="stat-value">{{ total_records }}</div>
-                <p class="stat-desc">
-                    P: {{ product_count }} • 
-                    C: {{ category_count }} • 
-                    Cu: {{ customer_count }}
-                </p>
-            </div>
-            
-            <!-- Categories -->
-            <div class="stat-card">
-                <div class="stat-header">
-                    <h3 class="stat-title">Categories</h3>
-                    <div class="stat-icon">🏷️</div>
-                </div>
-                <div class="stat-value">{{ category_count }}</div>
-                <p class="stat-desc">Product categories available</p>
-            </div>
+                <span class="self-start sm:self-center px-3 py-1.5 text-xs font-bold rounded-full bg-red-900/40 text-red-300 border border-red-700/50">ADMIN</span>
+            {% elseif is_granted('ROLE_STAFF') %}
+                <span class="self-start sm:self-center px-3 py-1.5 text-xs font-bold rounded-full bg-yellow-900/40 text-yellow-300 border border-yellow-700/50">STAFF</span>
+            {% else %}
+                <span class="self-start sm:self-center px-3 py-1.5 text-xs font-bold rounded-full bg-blue-900/40 text-blue-300 border border-blue-700/50">USER</span>
             {% endif %}
-            
-            <!-- Total Products -->
-            <div class="stat-card">
-                <div class="stat-header">
-                    <h3 class="stat-title">Total Products</h3>
-                    <div class="stat-icon">🍺</div>
-                </div>
-                <div class="stat-value">{{ product_count }}</div>
-                <p class="stat-desc">Brewery products in inventory</p>
-            </div>
-            
-            {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
-            <!-- Customers -->
-            <div class="stat-card">
-                <div class="stat-header">
-                    <h3 class="stat-title">Customers</h3>
-                    <div class="stat-icon">💼</div>
-                </div>
-                <div class="stat-value">{{ customer_count }}</div>
-                <p class="stat-desc">Registered customer accounts</p>
-            </div>
-            {% endif %}
-            
-            <!-- System Status -->
-            <div class="stat-card">
-                <div class="stat-header">
-                    <h3 class="stat-title">System Status</h3>
-                    <div class="stat-icon">✅</div>
-                </div>
-                <div class="stat-value">100%</div>
-                <p class="stat-desc">All systems operational</p>
-            </div>
-            
-            <!-- Active Sessions -->
-            <div class="stat-card">
-                <div class="stat-header">
-                    <h3 class="stat-title">Active Sessions</h3>
-                    <div class="stat-icon">👤</div>
-                </div>
-                <div class="stat-value">{{ user_count }}</div>
-                <p class="stat-desc">Currently active in system</p>
-            </div>
         </div>
+    </div>
 
-        <!-- Quick Actions Section -->
-        <div class="section-header">
-            <h2 class="section-title">Quick Actions</h2>
+    <!-- Stats Cards - Grey Outer Box with Black Inner Boxes -->
+    <div class="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-xl p-5 md:p-6 mb-8">
+        <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-700">
+            <h2 class="text-lg font-bold text-yellow-400">Statistics Overview</h2>
         </div>
         
-        <div class="actions-grid">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            <!-- Total Users - Admin Only -->
+            {% if is_granted('ROLE_ADMIN') %}
+            <div class="bg-gray-900 rounded-xl border border-gray-700 p-4 text-center hover:border-yellow-500/30 hover:-translate-y-1 transition-all duration-300">
+                <div class="w-12 h-12 bg-yellow-500/10 rounded-xl flex items-center justify-center border border-yellow-500/30 mx-auto mb-2">
+                    <span class="text-xl">👥</span>
+                </div>
+                <h3 class="text-white font-semibold text-sm mb-1">Total Users</h3>
+                <p class="text-3xl font-bold text-yellow-400 my-2">{{ user_count }}</p>
+                <p class="text-gray-500 text-xs">All registered users in the system</p>
+            </div>
+            
+            <!-- Staff Members - Admin Only -->
+            <div class="bg-gray-900 rounded-xl border border-gray-700 p-4 text-center hover:border-yellow-500/30 hover:-translate-y-1 transition-all duration-300">
+                <div class="w-12 h-12 bg-yellow-500/10 rounded-xl flex items-center justify-center border border-yellow-500/30 mx-auto mb-2">
+                    <span class="text-xl">👨‍💼</span>
+                </div>
+                <h3 class="text-white font-semibold text-sm mb-1">Staff Members</h3>
+                <p class="text-3xl font-bold text-yellow-400 my-2">{{ staff_count }}</p>
+                <p class="text-gray-500 text-xs">Active staff accounts</p>
+            </div>
+            
+            <!-- Total Records - Admin Only -->
+            <div class="bg-gray-900 rounded-xl border border-gray-700 p-4 text-center hover:border-yellow-500/30 hover:-translate-y-1 transition-all duration-300">
+                <div class="w-12 h-12 bg-yellow-500/10 rounded-xl flex items-center justify-center border border-yellow-500/30 mx-auto mb-2">
+                    <span class="text-xl">📊</span>
+                </div>
+                <h3 class="text-white font-semibold text-sm mb-1">Total Records</h3>
+                <p class="text-3xl font-bold text-yellow-400 my-2">{{ total_records }}</p>
+                <p class="text-gray-500 text-xs">P: {{ product_count }} • C: {{ category_count }} • Cu: {{ customer_count }}</p>
+            </div>
+            
+            <!-- Categories - Admin Only -->
+            <div class="bg-gray-900 rounded-xl border border-gray-700 p-4 text-center hover:border-yellow-500/30 hover:-translate-y-1 transition-all duration-300">
+                <div class="w-12 h-12 bg-yellow-500/10 rounded-xl flex items-center justify-center border border-yellow-500/30 mx-auto mb-2">
+                    <span class="text-xl">🏷️</span>
+                </div>
+                <h3 class="text-white font-semibold text-sm mb-1">Categories</h3>
+                <p class="text-3xl font-bold text-yellow-400 my-2">{{ category_count }}</p>
+                <p class="text-gray-500 text-xs">Product categories available</p>
+            </div>
+            {% endif %}
+            
+            <!-- Total Products - Admin and Staff -->
+            {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
+            <div class="bg-gray-900 rounded-xl border border-gray-700 p-4 text-center hover:border-yellow-500/30 hover:-translate-y-1 transition-all duration-300">
+                <div class="w-12 h-12 bg-yellow-500/10 rounded-xl flex items-center justify-center border border-yellow-500/30 mx-auto mb-2">
+                    <span class="text-xl">🍺</span>
+                </div>
+                <h3 class="text-white font-semibold text-sm mb-1">Total Products</h3>
+                <p class="text-3xl font-bold text-yellow-400 my-2">{{ product_count }}</p>
+                <p class="text-gray-500 text-xs">Brewery products in inventory</p>
+            </div>
+            {% endif %}
+            
+            <!-- Stock Items - Admin and Staff -->
+            {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
+            <div class="bg-gray-900 rounded-xl border border-gray-700 p-4 text-center hover:border-yellow-500/30 hover:-translate-y-1 transition-all duration-300">
+                <div class="w-12 h-12 bg-yellow-500/10 rounded-xl flex items-center justify-center border border-yellow-500/30 mx-auto mb-2">
+                    <span class="text-xl">📦</span>
+                </div>
+                <h3 class="text-white font-semibold text-sm mb-1">Stock Items</h3>
+                <p class="text-3xl font-bold text-yellow-400 my-2">{{ stock_count ?? 0 }}</p>
+                <p class="text-gray-500 text-xs">Products in inventory</p>
+            </div>
+            {% endif %}
+            
+            <!-- Customers - Admin and Staff -->
+            {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
+            <div class="bg-gray-900 rounded-xl border border-gray-700 p-4 text-center hover:border-yellow-500/30 hover:-translate-y-1 transition-all duration-300">
+                <div class="w-12 h-12 bg-yellow-500/10 rounded-xl flex items-center justify-center border border-yellow-500/30 mx-auto mb-2">
+                    <span class="text-xl">💼</span>
+                </div>
+                <h3 class="text-white font-semibold text-sm mb-1">Customers</h3>
+                <p class="text-3xl font-bold text-yellow-400 my-2">{{ customer_count }}</p>
+                <p class="text-gray-500 text-xs">Registered customer accounts</p>
+            </div>
+            {% endif %}
+            
+            <!-- System Status - Everyone -->
+            <div class="bg-gray-900 rounded-xl border border-gray-700 p-4 text-center hover:border-yellow-500/30 hover:-translate-y-1 transition-all duration-300">
+                <div class="w-12 h-12 bg-yellow-500/10 rounded-xl flex items-center justify-center border border-yellow-500/30 mx-auto mb-2">
+                    <span class="text-xl">✅</span>
+                </div>
+                <h3 class="text-white font-semibold text-sm mb-1">System Status</h3>
+                <p class="text-3xl font-bold text-green-400 my-2">100%</p>
+                <p class="text-gray-500 text-xs">All systems operational</p>
+            </div>
+            
+            <!-- Active Sessions - Everyone -->
+            <div class="bg-gray-900 rounded-xl border border-gray-700 p-4 text-center hover:border-yellow-500/30 hover:-translate-y-1 transition-all duration-300">
+                <div class="w-12 h-12 bg-yellow-500/10 rounded-xl flex items-center justify-center border border-yellow-500/30 mx-auto mb-2">
+                    <span class="text-xl">👤</span>
+                </div>
+                <h3 class="text-white font-semibold text-sm mb-1">Active Sessions</h3>
+                <p class="text-3xl font-bold text-yellow-400 my-2">{{ user_count }}</p>
+                <p class="text-gray-500 text-xs">Currently active in system</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions Section -->
+    <div class="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-xl p-5 md:p-6 mb-8">
+        <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-700">
+            <h2 class="text-lg font-bold text-yellow-400">Quick Actions</h2>
+        </div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <!-- Manage Products -->
-            <div class="action-card">
-                <div class="action-icon">🍺</div>
-                <h3 class="action-title">Manage Products</h3>
-                <p class="action-desc">Add, edit, or remove brewery products</p>
-                <a href="{{ path('app_product_index') }}" class="action-btn">
-                    <span>View Products</span>
+            <div class="bg-gray-900 rounded-xl border border-gray-700 p-4 text-center hover:border-yellow-500/30 hover:-translate-y-1 transition-all duration-300">
+                <div class="w-12 h-12 bg-yellow-500/10 rounded-xl flex items-center justify-center border border-yellow-500/30 mx-auto mb-2">
+                    <span class="text-xl">🍺</span>
+                </div>
+                <h3 class="text-white font-semibold text-sm mb-1">Manage Products</h3>
+                <p class="text-gray-500 text-xs mb-3">Add, edit, or remove products</p>
+                <a href="{{ path('app_product_index') }}" class="inline-flex items-center gap-1 px-3 py-1 text-xs font-medium text-yellow-400 bg-yellow-900/20 rounded-lg hover:bg-yellow-900/40 transition-all duration-200">
+                    <span>View</span>
                     <span>→</span>
                 </a>
             </div>
             
             <!-- View Orders -->
-            <div class="action-card">
-                <div class="action-icon">📦</div>
-                <h3 class="action-title">View Orders</h3>
-                <p class="action-desc">Monitor and manage customer orders</p>
-                <a href="{{ path('app_order_index') }}" class="action-btn">
-                    <span>View Orders</span>
+            <div class="bg-gray-900 rounded-xl border border-gray-700 p-4 text-center hover:border-yellow-500/30 hover:-translate-y-1 transition-all duration-300">
+                <div class="w-12 h-12 bg-yellow-500/10 rounded-xl flex items-center justify-center border border-yellow-500/30 mx-auto mb-2">
+                    <span class="text-xl">📦</span>
+                </div>
+                <h3 class="text-white font-semibold text-sm mb-1">View Orders</h3>
+                <p class="text-gray-500 text-xs mb-3">Monitor customer orders</p>
+                <a href="{{ path('app_order_index') }}" class="inline-flex items-center gap-1 px-3 py-1 text-xs font-medium text-yellow-400 bg-yellow-900/20 rounded-lg hover:bg-yellow-900/40 transition-all duration-200">
+                    <span>View</span>
                     <span>→</span>
                 </a>
             </div>
-            
-            {% if is_granted('ROLE_ADMIN') %}
-            <!-- Manage Users -->
-            <div class="action-card">
-                <div class="action-icon">👥</div>
-                <h3 class="action-title">Manage Users</h3>
-                <p class="action-desc">Add, edit, or remove user accounts</p>
-                <a href="{{ path('app_user_index') }}" class="action-btn">
-                    <span>View Users</span>
-                    <span>→</span>
-                </a>
-            </div>
-            
-            <!-- Manage Categories -->
-            <div class="action-card">
-                <div class="action-icon">🏷️</div>
-                <h3 class="action-title">Manage Categories</h3>
-                <p class="action-desc">Organize product categories</p>
-                <a href="{{ path('app_category_index') }}" class="action-btn">
-                    <span>View Categories</span>
-                    <span>→</span>
-                </a>
-            </div>
-            
-            <!-- Activity Logs -->
-            <div class="action-card">
-                <div class="action-icon">📊</div>
-                <h3 class="action-title">Activity Logs</h3>
-                <p class="action-desc">Monitor system activities</p>
-                <a href="{{ path('app_activity_log_index') }}" class="action-btn">
-                    <span>View Logs</span>
-                    <span>→</span>
-                </a>
-            </div>
-            {% endif %}
-            
+
+            <!-- Manage Stock - Admin and Staff -->
             {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
-            <!-- Manage Customers -->
-            <div class="action-card">
-                <div class="action-icon">💼</div>
-                <h3 class="action-title">Manage Customers</h3>
-                <p class="action-desc">Handle customer accounts</p>
-                <a href="{{ path('app_customer_index') }}" class="action-btn">
-                    <span>View Customers</span>
+            <div class="bg-gray-900 rounded-xl border border-gray-700 p-4 text-center hover:border-yellow-500/30 hover:-translate-y-1 transition-all duration-300">
+                <div class="w-12 h-12 bg-yellow-500/10 rounded-xl flex items-center justify-center border border-yellow-500/30 mx-auto mb-2">
+                    <span class="text-xl">📊</span>
+                </div>
+                <h3 class="text-white font-semibold text-sm mb-1">Manage Stock</h3>
+                <p class="text-gray-500 text-xs mb-3">Track inventory levels</p>
+                <a href="{{ path('app_stock_index') }}" class="inline-flex items-center gap-1 px-3 py-1 text-xs font-medium text-yellow-400 bg-yellow-900/20 rounded-lg hover:bg-yellow-900/40 transition-all duration-200">
+                    <span>View</span>
                     <span>→</span>
                 </a>
             </div>
             {% endif %}
-            
-            <!-- My Profile -->
-            <div class="action-card">
-                <div class="action-icon">👤</div>
-                <h3 class="action-title">My Profile</h3>
-                <p class="action-desc">View and edit your profile</p>
-                <a href="{{ path('app_profile_index') }}" class="action-btn">
-                    <span>View Profile</span>
+
+            <!-- Manage Customers - Admin and Staff -->
+            {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
+            <div class="bg-gray-900 rounded-xl border border-gray-700 p-4 text-center hover:border-yellow-500/30 hover:-translate-y-1 transition-all duration-300">
+                <div class="w-12 h-12 bg-yellow-500/10 rounded-xl flex items-center justify-center border border-yellow-500/30 mx-auto mb-2">
+                    <span class="text-xl">💼</span>
+                </div>
+                <h3 class="text-white font-semibold text-sm mb-1">Manage Customers</h3>
+                <p class="text-gray-500 text-xs mb-3">Handle customer accounts</p>
+                <a href="{{ path('app_customer_index') }}" class="inline-flex items-center gap-1 px-3 py-1 text-xs font-medium text-yellow-400 bg-yellow-900/20 rounded-lg hover:bg-yellow-900/40 transition-all duration-200">
+                    <span>View</span>
+                    <span>→</span>
+                </a>
+            </div>
+            {% endif %}
+
+            <!-- Manage Users - Admin Only -->
+            {% if is_granted('ROLE_ADMIN') %}
+            <div class="bg-gray-900 rounded-xl border border-gray-700 p-4 text-center hover:border-yellow-500/30 hover:-translate-y-1 transition-all duration-300">
+                <div class="w-12 h-12 bg-yellow-500/10 rounded-xl flex items-center justify-center border border-yellow-500/30 mx-auto mb-2">
+                    <span class="text-xl">👥</span>
+                </div>
+                <h3 class="text-white font-semibold text-sm mb-1">Manage Users</h3>
+                <p class="text-gray-500 text-xs mb-3">Add, edit, or remove users</p>
+                <a href="{{ path('app_user_index') }}" class="inline-flex items-center gap-1 px-3 py-1 text-xs font-medium text-yellow-400 bg-yellow-900/20 rounded-lg hover:bg-yellow-900/40 transition-all duration-200">
+                    <span>View</span>
+                    <span>→</span>
+                </a>
+            </div>
+
+            <!-- Manage Categories - Admin Only -->
+            <div class="bg-gray-900 rounded-xl border border-gray-700 p-4 text-center hover:border-yellow-500/30 hover:-translate-y-1 transition-all duration-300">
+                <div class="w-12 h-12 bg-yellow-500/10 rounded-xl flex items-center justify-center border border-yellow-500/30 mx-auto mb-2">
+                    <span class="text-xl">🏷️</span>
+                </div>
+                <h3 class="text-white font-semibold text-sm mb-1">Manage Categories</h3>
+                <p class="text-gray-500 text-xs mb-3">Organize categories</p>
+                <a href="{{ path('app_category_index') }}" class="inline-flex items-center gap-1 px-3 py-1 text-xs font-medium text-yellow-400 bg-yellow-900/20 rounded-lg hover:bg-yellow-900/40 transition-all duration-200">
+                    <span>View</span>
+                    <span>→</span>
+                </a>
+            </div>
+
+            <!-- Activity Logs - Admin Only -->
+            <div class="bg-gray-900 rounded-xl border border-gray-700 p-4 text-center hover:border-yellow-500/30 hover:-translate-y-1 transition-all duration-300">
+                <div class="w-12 h-12 bg-yellow-500/10 rounded-xl flex items-center justify-center border border-yellow-500/30 mx-auto mb-2">
+                    <span class="text-xl">📊</span>
+                </div>
+                <h3 class="text-white font-semibold text-sm mb-1">Activity Logs</h3>
+                <p class="text-gray-500 text-xs mb-3">Monitor system activities</p>
+                <a href="{{ path('app_activity_log_index') }}" class="inline-flex items-center gap-1 px-3 py-1 text-xs font-medium text-yellow-400 bg-yellow-900/20 rounded-lg hover:bg-yellow-900/40 transition-all duration-200">
+                    <span>View</span>
+                    <span>→</span>
+                </a>
+            </div>
+            {% endif %}
+
+            <!-- My Profile - Everyone -->
+            <div class="bg-gray-900 rounded-xl border border-gray-700 p-4 text-center hover:border-yellow-500/30 hover:-translate-y-1 transition-all duration-300">
+                <div class="w-12 h-12 bg-yellow-500/10 rounded-xl flex items-center justify-center border border-yellow-500/30 mx-auto mb-2">
+                    <span class="text-xl">👤</span>
+                </div>
+                <h3 class="text-white font-semibold text-sm mb-1">My Profile</h3>
+                <p class="text-gray-500 text-xs mb-3">View and edit your profile</p>
+                <a href="{{ path('app_profile_index') }}" class="inline-flex items-center gap-1 px-3 py-1 text-xs font-medium text-yellow-400 bg-yellow-900/20 rounded-lg hover:bg-yellow-900/40 transition-all duration-200">
+                    <span>View</span>
                     <span>→</span>
                 </a>
             </div>
         </div>
+    </div>
 
-        <!-- Activity Logs Section -->
-        <div class="section-header">
-            <h2 class="section-title">Recent Activity Logs</h2>
+    <!-- Activity Logs Section - Admin Only -->
+    {% if is_granted('ROLE_ADMIN') %}
+    <div class="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-xl p-5 md:p-6 mb-8">
+        <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-700">
+            <h2 class="text-lg font-bold text-yellow-400">Recent Activity Logs</h2>
         </div>
         
-        <div class="activity-section">
-            <table class="activity-table">
+        <div class="overflow-x-auto">
+            <table class="w-full min-w-[640px]">
                 <thead>
-                    <tr class="activity-header-row">
-                        <th class="activity-header-cell">USER</th>
-                        <th class="activity-header-cell">ROLE</th>
-                        <th class="activity-header-cell">ACTION</th>
-                        <th class="activity-header-cell">DETAILS</th>
-                        <th class="activity-header-cell">TIMESTAMP</th>
+                    <tr class="border-b border-gray-700">
+                        <th class="py-2 px-3 text-left text-xs font-semibold text-yellow-400 uppercase">USER</th>
+                        <th class="py-2 px-3 text-left text-xs font-semibold text-yellow-400 uppercase">ROLE</th>
+                        <th class="py-2 px-3 text-left text-xs font-semibold text-yellow-400 uppercase">ACTION</th>
+                        <th class="py-2 px-3 text-left text-xs font-semibold text-yellow-400 uppercase">DETAILS</th>
+                        <th class="py-2 px-3 text-left text-xs font-semibold text-yellow-400 uppercase">TIME</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% if recent_activities|length > 0 %}
                         {% for activity in recent_activities|slice(0, 5) %}
-                            <tr class="activity-row">
-                                <td class="activity-cell user-cell">
-                                    {{ activity.user.email|split('@')[0] }}
-                                </td>
-                                <td class="activity-cell">
+                            <tr class="border-b border-gray-800 hover:bg-yellow-500/5 transition-all duration-200">
+                                <td class="py-2 px-3 text-yellow-400 font-medium text-sm">{{ activity.user.email|split('@')[0] }}</td>
+                                <td class="py-2 px-3">
                                     {% if 'ROLE_ADMIN' in activity.user.roles %}
-                                        <span class="role-cell admin">ADMIN</span>
+                                        <span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-red-900/40 text-red-300 border border-red-700/50">ADMIN</span>
                                     {% elseif 'ROLE_STAFF' in activity.user.roles %}
-                                        <span class="role-cell staff">STAFF</span>
+                                        <span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-yellow-900/40 text-yellow-300 border border-yellow-700/50">STAFF</span>
                                     {% else %}
-                                        <span class="role-cell">USER</span>
+                                        <span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-blue-900/40 text-blue-300 border border-blue-700/50">USER</span>
                                     {% endif %}
                                 </td>
-                                <td class="activity-cell action-cell {{ activity.action|lower }}">
-                                    {{ activity.action }}
+                                <td class="py-2 px-3">
+                                    <span class="px-2 py-0.5 text-xs font-semibold rounded-full 
+                                        {% if activity.action == 'LOGIN' %}bg-green-900/40 text-green-300 border border-green-700/50
+                                        {% elseif activity.action == 'LOGOUT' %}bg-gray-700 text-gray-400 border border-gray-600
+                                        {% elseif activity.action == 'CREATE' %}bg-blue-900/40 text-blue-300 border border-blue-700/50
+                                        {% elseif activity.action == 'UPDATE' %}bg-yellow-900/40 text-yellow-300 border border-yellow-700/50
+                                        {% elseif activity.action == 'STATUS_CHANGE' %}bg-purple-900/40 text-purple-300 border border-purple-700/50
+                                        {% elseif activity.action == 'STOCK_ADD' %}bg-emerald-900/40 text-emerald-300 border border-emerald-700/50
+                                        {% elseif activity.action == 'STOCK_REMOVE' %}bg-orange-900/40 text-orange-300 border border-orange-700/50
+                                        {% else %}bg-red-900/40 text-red-300 border border-red-700/50{% endif %}">
+                                        {{ activity.action }}
+                                    </span>
                                 </td>
-                                <td class="activity-cell">{{ activity.details[:50] }}{{ activity.details|length > 50 ? '...' : '' }}</td>
-                                <td class="activity-cell timestamp-cell">
-                                    {{ activity.createdAt|date('Y-m-d H:i') }}
-                                </td>
+                                <td class="py-2 px-3 text-black text-sm">{{ activity.details[:50] }}{{ activity.details|length > 50 ? '...' : '' }}</td>
+                                <td class="py-2 px-3 text-back text-xs">{{ activity.createdAt|date('m/d H:i') }}</td>
                             </tr>
                         {% endfor %}
                     {% else %}
-                        <tr class="activity-row">
-                            <td colspan="5" class="activity-cell text-center" style="color: #94a3b8;">
-                                No recent activities to display
-                            </td>
+                        <tr>
+                            <td colspan="5" class="py-6 px-4 text-center text-gray-500 text-sm">No recent activities to display</td>
                         </tr>
                     {% endif %}
                 </tbody>
             </table>
         </div>
+    </div>
+    {% endif %}
 
-        <!-- System Status Section -->
-        <div class="status-section">
-            <h3 class="status-title">System Status</h3>
-            <div class="status-grid">
-                <div class="status-item">
-                    <span class="status-label">Application Status</span>
-                    <span class="status-value online">Online</span>
-                </div>
-                <div class="status-item">
-                    <span class="status-label">Database Status</span>
-                    <span class="status-value online">Connected</span>
-                </div>
-                <div class="status-item">
-                    <span class="status-label">Server Load</span>
-                    <span class="status-value">Low</span>
-                </div>
-                <div class="status-item">
-                    <span class="status-label">Response Time</span>
-                    <span class="status-value">Fast</span>
-                </div>
+    <!-- System Status Section -->
+    <div class="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-xl p-5 md:p-6 mb-8">
+        <h3 class="text-base sm:text-lg font-bold text-yellow-400 mb-4">System Status</h3>
+        <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="flex justify-between items-center p-3 bg-gray-800/50 rounded-xl border-l-3 border-l-yellow-400">
+                <span class="text-gray-300 text-sm font-medium">Application Status</span>
+                <span class="text-green-400 font-semibold text-sm">Online</span>
             </div>
-        </div>
-
-        <!-- System Footer -->
-        <div class="activity-section">
-            <div style="padding: 1rem; text-align: center;">
-                <p style="color: #94a3b8; font-size: 0.9rem;">
-                    Samaco Brewery Management System • v1.0.0 • 
-                    <span style="color: #10B981;">● System Online</span> • 
-                    Last Updated: <span id="lastUpdated">Just now</span>
-                </p>
+            <div class="flex justify-between items-center p-3 bg-gray-800/50 rounded-xl border-l-3 border-l-yellow-400">
+                <span class="text-gray-300 text-sm font-medium">Database Status</span>
+                <span class="text-green-400 font-semibold text-sm">Connected</span>
+            </div>
+            <div class="flex justify-between items-center p-3 bg-gray-800/50 rounded-xl border-l-3 border-l-yellow-400">
+                <span class="text-gray-300 text-sm font-medium">Server Load</span>
+                <span class="text-yellow-400 font-semibold text-sm">Low</span>
+            </div>
+            <div class="flex justify-between items-center p-3 bg-gray-800/50 rounded-xl border-l-3 border-l-yellow-400">
+                <span class="text-gray-300 text-sm font-medium">Response Time</span>
+                <span class="text-green-400 font-semibold text-sm">Fast</span>
             </div>
         </div>
     </div>
+
+    <!-- System Footer -->
+    <div class="bg-gray-900/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-xl p-4 text-center">
+        <p class="text-gray-500 text-xs">
+            Samaco Brewery Management System • v1.0.0 • 
+            <span class="text-green-400">● System Online</span> • 
+            Last Updated: <span id="lastUpdated" class="text-yellow-400">Just now</span>
+        </p>
+    </div>
+</div>
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
     <script>
-        // Update "last updated" timestamp
-           // Update "last updated" timestamp
-           // Update "last updated" timestamp
-      // Update "last updated" timestamp
         function updateLastUpdated() {
             const lastUpdatedElem = document.getElementById('lastUpdated');
             const now = new Date();
-            const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            const options = { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
             lastUpdatedElem.textContent = now.toLocaleDateString(undefined, options);
         }
         updateLastUpdated();

@@ -6,9 +6,14 @@
 <div class="container mx-auto px-4 py-8">
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-3xl font-bold text-yellow-500">⚠️ Low Stock Alerts</h1>
-        <a href="{{ path('app_stock_index') }}" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition duration-200">
-            ← Back to Stock
-        </a>
+        <a href="{{ path('app_stock_index') }}"
+               class="inline-flex items-center gap-2 px-5 py-3 text-sm font-semibold text-white 
+                      bg-gray-700 rounded-xl hover:bg-gray-600 hover:text-white transition-all duration-200
+                      border border-gray-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-gray-900
+                      self-start sm:self-center shadow-md">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Back to Stock
+            </a>
     </div>
 
     {% if products|length > 0 %}

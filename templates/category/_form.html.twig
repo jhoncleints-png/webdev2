@@ -27,16 +27,12 @@
                             'class': 'w-full px-4 py-3.5 bg-gray-800/50 border border-gray-700 rounded-xl 
                                      text-white placeholder-gray-500 focus:outline-none focus:ring-2 
                                      focus:ring-yellow-500 focus:border-yellow-500 transition duration-200
-                                     hover:border-gray-600 text-base md:text-lg',
+                                     hover:border-gray-600 text-base',
                             'placeholder': 'e.g., IPAs, Stouts, Lagers'
                         }
                     }) }}
                     
-                    {% if form.name.vars.errors|length > 0 %}
-                        <div class="mt-2 text-sm text-red-400 space-y-1">
-                            {{ form_errors(form.name) }}
-                        </div>
-                    {% endif %}
+                    {{ form_errors(form.name) }}
                 </div>
 
                 <!-- Description Field -->
@@ -53,16 +49,12 @@
                                      text-white placeholder-gray-500 focus:outline-none focus:ring-2 
                                      focus:ring-yellow-500 focus:border-yellow-500 transition duration-200
                                      hover:border-gray-600 resize-y min-h-[150px] text-base',
-                            'rows': 5,
+                            'rows': 4,
                             'placeholder': 'Describe this beer category...'
                         }
                     }) }}
                     
-                    {% if form.description.vars.errors|length > 0 %}
-                        <div class="mt-2 text-sm text-red-400 space-y-1">
-                            {{ form_errors(form.description) }}
-                        </div>
-                    {% endif %}
+                    {{ form_errors(form.description) }}
                 </div>
             </div>
 
@@ -71,33 +63,33 @@
                 <!-- Submit Button -->
                 <button type="submit"
                         class="group inline-flex items-center justify-center gap-3 px-8 py-4 text-base font-bold 
-                               bg-gradient-to-r from-yellow-600 to-yellow-700 text-black rounded-xl
-                               hover:from-yellow-500 hover:to-yellow-600 active:scale-[0.98]
-                               shadow-lg hover:shadow-xl shadow-yellow-900/30
-                               border border-yellow-800/30 transition-all duration-200
-                               focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-gray-900
-                               flex-1 sm:flex-none min-h-[52px]">
-                    
-                    <svg class="w-5 h-5 transition-transform group-hover:scale-110" 
-                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                              d="M5 13l4 4L19 7"></path>
+                            bg-yellow-500 text-black rounded-xl
+                            hover:bg-yellow-400 active:scale-[0.98]
+                            shadow-lg hover:shadow-xl shadow-yellow-500/25
+                            transition-all duration-200
+                            focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-gray-900
+                            flex-1 sm:flex-none min-h-[52px]">
+
+                    <svg class="w-5 h-5 transition-transform group-hover:scale-110"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M5 13l4 4L19 7"></path>
                     </svg>
-                    
+
                     <span>{{ button_label|default('Save Category') }}</span>
                 </button>
 
                 <!-- Cancel Button -->
                 <a href="{{ path('app_category_index') }}"
-                   class="inline-flex items-center justify-center gap-3 px-8 py-4 text-base font-semibold
-                          bg-gray-800/60 text-gray-300 rounded-xl hover:bg-gray-800 hover:text-white
-                          active:scale-[0.98] border border-gray-700/50 transition-all duration-200
-                          focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-900
-                          flex-1 sm:flex-none min-h-[52px]">
+                class="inline-flex items-center justify-center gap-3 px-8 py-4 text-base font-semibold
+                        bg-gray-600 text-white rounded-xl hover:bg-gray-500 hover:text-white
+                        active:scale-[0.98] border border-gray-500/50 transition-all duration-200
+                        focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-900
+                        flex-1 sm:flex-none min-h-[52px]">
                     
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                              d="M6 18L18 6M6 6l12 12"></path>
+                            d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
                     
                     <span>Cancel</span>

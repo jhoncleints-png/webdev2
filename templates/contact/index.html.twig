@@ -1,0 +1,937 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Contact Us - Samaco Brewery{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #e2e8f0;
+            overflow-x: hidden;
+            background: #0a0a0a;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #FFD700 0%, #FFC107 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: #9ca3af;
+            font-size: 1.125rem;
+            max-width: 600px;
+            margin: 0 auto 3rem;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            display: inline-block;
+            background: linear-gradient(135deg, #FFD700 0%, #FFC107 100%);
+            color: #000;
+            padding: 12px 28px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-secondary {
+            display: inline-block;
+            background: transparent;
+            color: #FFD700;
+            padding: 12px 28px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            border: 2px solid #FFD700;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 215, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* Navigation */
+        .navbar {
+            background: linear-gradient(180deg, #000000 0%, #0a0a0a 100%);
+            border-bottom: 2px solid #FFD700;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo img {
+            height: 40px;
+            width: auto;
+        }
+
+        .logo span {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #FFD700 0%, #FFC107 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #e2e8f0;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #FFD700;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            color: #FFD700;
+            font-size: 28px;
+        }
+
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 80px;
+            left: 0;
+            right: 0;
+            background: #000000;
+            border-bottom: 2px solid #FFD700;
+            padding: 1rem;
+            z-index: 999;
+        }
+
+        .mobile-menu.active {
+            display: block;
+        }
+
+        .mobile-menu a {
+            display: block;
+            padding: 12px 16px;
+            color: #e2e8f0;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .mobile-menu a:hover,
+        .mobile-menu a.active {
+            color: #FFD700;
+        }
+
+        /* Hero Section with Background Image */
+        .contact-hero {
+            padding: 0;
+            min-height: 450px;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            background-size: cover;
+            background-position: center !important;
+            background-repeat: no-repeat;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.3) 100%);
+            z-index: 1;
+        }
+
+        .contact-hero .container {
+            position: relative;
+            z-index: 2;
+        }
+
+        .contact-hero-bg {
+            background-image: url('../images/contact-hero.jpg');
+            min-height: 700px;
+        }
+
+        .contact-hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #FFD700 0%, #FFC107 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .contact-hero p {
+            font-size: 1.125rem;
+            color: #e2e8f0;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        @media (max-width: 768px) {
+            .contact-hero {
+                min-height: 350px;
+            }
+            .contact-hero h1 {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .contact-hero {
+                min-height: 300px;
+            }
+            .contact-hero h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Contact Section */
+        .contact-section {
+            padding: 80px 0;
+            background: #000000;
+        }
+
+        .contact-section::after {
+            content: '';
+            display: block;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.25), transparent);
+            margin-top: 80px;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            margin-top: 20px;
+        }
+
+        /* Contact Form Card */
+        .contact-card {
+            background: linear-gradient(135deg, #0a0a0a 0%, #111111 100%);
+            border-radius: 28px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .contact-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 215, 0, 0.3);
+            box-shadow: 0 20px 55px rgba(0, 0, 0, 0.5);
+        }
+
+        .contact-card h2 {
+            font-size: 1.8rem;
+            color: #FFD700;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #FFD700;
+            padding-left: 1rem;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #FFD700;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #0a0a0a;
+            color: #e2e8f0;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #FFD700;
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+            background: #111111;
+        }
+
+        .form-input::placeholder {
+            color: #6b7280;
+        }
+
+        textarea.form-input {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        select.form-input {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23FFD700'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 20px;
+        }
+
+        /* Alert Messages */
+        .alert-success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #4ade80;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #f87171;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Info Cards */
+        .info-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, #0a0a0a 0%, #111111 100%);
+            border-radius: 20px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .info-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(255, 215, 0, 0.3);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5);
+        }
+
+        .info-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 215, 0, 0.05) 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .info-content h3 {
+            font-size: 1.1rem;
+            color: #FFD700;
+            margin-bottom: 0.25rem;
+        }
+
+        .info-content p {
+            color: #9ca3af;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* Social Links */
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 0.5rem;
+        }
+
+        .social-link {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 215, 0, 0.05) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFD700;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .social-link:hover {
+            background: linear-gradient(135deg, #FFD700 0%, #FFC107 100%);
+            color: #000;
+            transform: translateY(-2px);
+        }
+
+        /* Map Section */
+        .map-section {
+            padding: 60px 0;
+            background: linear-gradient(180deg, #0a0a0a 0%, #000000 100%);
+        }
+
+        .map-section::after {
+            content: '';
+            display: block;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.25), transparent);
+            margin-top: 60px;
+        }
+
+        .map-container {
+            border-radius: 28px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .map-wrapper {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, #0a0a0a 0%, #111111 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .map-content {
+            text-align: center;
+            padding: 60px;
+        }
+
+        .map-content h3 {
+            color: #FFD700;
+            margin-bottom: 16px;
+            font-size: 1.5rem;
+        }
+
+        .map-content p {
+            color: #9ca3af;
+            margin-bottom: 8px;
+        }
+
+        .map-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #FFD700;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .map-link:hover {
+            color: #FFC107;
+        }
+
+        @media (max-width: 768px) {
+            .map-wrapper {
+                height: 300px;
+            }
+            .map-content {
+                padding: 30px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .map-wrapper {
+                height: 250px;
+            }
+            .map-content {
+                padding: 20px;
+            }
+            .map-content h3 {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 80px 0;
+            background: linear-gradient(135deg, #FFD700 0%, #FFC107 100%);
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #000;
+        }
+
+        .cta-section p {
+            font-size: 1.125rem;
+            margin-bottom: 2rem;
+            color: #1a1a1a;
+            opacity: 0.9;
+        }
+
+        .btn-white {
+            display: inline-block;
+            background: #000;
+            color: #FFD700;
+            padding: 12px 32px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+
+        .btn-white:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Footer */
+        .footer {
+            background: #000000;
+            color: #9ca3af;
+            padding: 60px 0 30px;
+            border-top: 2px solid #FFD700;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 48px;
+            margin-bottom: 48px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            text-decoration: none;
+        }
+
+        .footer-logo span {
+            font-size: 1.125rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #FFD700 0%, #FFC107 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .footer h4 {
+            color: #FFD700;
+            margin-bottom: 20px;
+            font-size: 1.125rem;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: #9ca3af;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #FFD700;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 215, 0, 0.2);
+            font-size: 0.875rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .contact-grid {
+                gap: 32px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .contact-hero {
+                padding: 140px 0 60px;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .footer-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 32px;
+            }
+            
+            .cta-section h2 {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 20px;
+            }
+            
+            .contact-card {
+                padding: 1.5rem;
+            }
+            
+            .info-card {
+                padding: 1.25rem;
+            }
+            
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<!-- Navigation -->
+<nav class="navbar">
+    <div class="container">
+        <a href="{{ path('app_landing') }}" class="logo">
+            <img src="{{ asset('images/logo.png') }}" alt="Samaco Brewery">
+            <span>Samaco Brewery</span>
+        </a>
+        
+        <div class="nav-links">
+            <a href="{{ path('app_landing') }}">Home</a>
+            <a href="{{ path('app_about') }}">About</a>
+            <a href="{{ path('app_contact') }}" class="active">Contact</a>
+        </div>
+        
+        <div class="nav-buttons">
+            <a href="{{ path('app_login') }}" class="btn-secondary" style="padding: 8px 20px;">Login</a>
+            <a href="{{ path('app_register') }}" class="btn-primary" style="padding: 8px 20px;">Get Started</a>
+        </div>
+        
+        <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+    </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+    <a href="{{ path('app_landing') }}">Home</a>
+    <a href="{{ path('app_about') }}">About</a>
+    <a href="{{ path('app_contact') }}" class="active">Contact</a>
+</div>
+
+<!-- Hero Section with Background Image -->
+<section class="contact-hero contact-hero-bg">
+    <div class="hero-overlay"></div>
+    <div class="container">
+        <h1>Contact Us</h1>
+        <p>Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="contact-section">
+    <div class="container">
+        <div class="contact-grid">
+            
+            <!-- Contact Form -->
+            <div class="contact-card">
+                <h2>Send us a Message</h2>
+                
+                {% for message in app.flashes('success') %}
+                    <div class="alert-success">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span>✓</span>
+                            <span>{{ message }}</span>
+                        </div>
+                    </div>
+                {% endfor %}
+                
+                {% if error %}
+                    <div class="alert-error">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span>⚠</span>
+                            <span>{{ error }}</span>
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <form method="POST" action="{{ path('app_contact') }}">
+                    <div class="form-group">
+                        <label for="name">Your Name</label>
+                        <input type="text" id="name" name="name" required class="form-input" placeholder="Juan Dela Cruz">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" required class="form-input" placeholder="juan@example.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="subject">Subject</label>
+                        <select id="subject" name="subject" required class="form-input">
+                            <option value="">Select a subject</option>
+                            <option value="General Inquiry">General Inquiry</option>
+                            <option value="Product Information">Product Information</option>
+                            <option value="Order Support">Order Support</option>
+                            <option value="Feedback">Feedback</option>
+                            <option value="Partnership">Partnership</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea id="message" name="message" rows="5" required class="form-input" placeholder="Tell us how we can help you..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary" style="width: 100%;">Send Message</button>
+                </form>
+            </div>
+            
+            <!-- Contact Info -->
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="info-icon">📍</div>
+                    <div class="info-content">
+                        <h3>Visit Us</h3>
+                        <p>123 Brewery Street<br>Manila, Philippines 1000</p>
+                    </div>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-icon">📧</div>
+                    <div class="info-content">
+                        <h3>Email Us</h3>
+                        <p>info@samacobrewery.com<br>support@samacobrewery.com</p>
+                    </div>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-icon">📞</div>
+                    <div class="info-content">
+                        <h3>Call Us</h3>
+                        <p>+63 123 456 7890<br>+63 987 654 3210</p>
+                    </div>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-icon">🕒</div>
+                    <div class="info-content">
+                        <h3>Business Hours</h3>
+                        <p>Monday - Friday: 9AM - 6PM<br>Saturday: 10AM - 4PM<br>Sunday: Closed</p>
+                    </div>
+                </div>
+                
+                <!-- Social Links -->
+                <div class="social-links">
+                    <a href="#" class="social-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
+                        </svg>
+                    </a>
+                    <a href="#" class="social-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069z"/>
+                        </svg>
+                    </a>
+                    <a href="#" class="social-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Map Section -->
+<section class="map-section">
+    <div class="container">
+        <div class="map-container">
+            <div class="map-wrapper">
+                <div class="map-content">
+                    <div style="font-size: 64px; margin-bottom: 20px;">📍</div>
+                    <h3>Samaco Brewery</h3>
+                    <p>123 Brewery Street</p>
+                    <p>Manila, Philippines 1000</p>
+                    <a href="https://maps.google.com/?q=Manila+Philippines" target="_blank" class="map-link">View on Google Maps →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <h2>Join Our Brewery Family</h2>
+        <p>Experience the best of Filipino craft beer. Visit us or order online!</p>
+        <a href="{{ path('app_register') }}" class="btn-white">Get Started Today</a>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div>
+                <a href="{{ path('app_landing') }}" class="footer-logo">
+                    <img src="{{ asset('images/logo.png') }}" alt="Samaco Brewery" style="height: 32px;">
+                    <span>Samaco Brewery</span>
+                </a>
+                <p style="margin-top: 16px;">Crafting excellence in every pour since 2020.</p>
+            </div>
+            
+            <div>
+                <h4>Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="{{ path('app_landing') }}">Home</a></li>
+                    <li><a href="{{ path('app_about') }}">About</a></li>
+                    <li><a href="{{ path('app_contact') }}">Contact</a></li>
+                </ul>
+            </div>
+            
+            <div>
+                <h4>Account</h4>
+                <ul class="footer-links">
+                    <li><a href="{{ path('app_login') }}">Login</a></li>
+                    <li><a href="{{ path('app_register') }}">Register</a></li>
+                </ul>
+            </div>
+            
+            <div>
+                <h4>Contact</h4>
+                <ul class="footer-links">
+                    <li>123 Brewery Street</li>
+                    <li>Manila, Philippines</li>
+                    <li>info@samacobrewery.com</li>
+                    <li>+63 123 456 7890</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2026 Samaco Brewery. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    
+    if (mobileMenuBtn && mobileMenu) {
+        mobileMenuBtn.addEventListener('click', function() {
+            mobileMenu.classList.toggle('active');
+        });
+        
+        const mobileLinks = mobileMenu.querySelectorAll('a');
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                mobileMenu.classList.remove('active');
+            });
+        });
+        
+        window.addEventListener('resize', function() {
+            if (window.innerWidth >= 768) {
+                mobileMenu.classList.remove('active');
+            }
+        });
+    }
+</script>
+{% endblock %}

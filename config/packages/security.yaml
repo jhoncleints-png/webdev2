@@ -1,5 +1,4 @@
 security:
-    # ADD THIS ROLE HIERARCHY
     role_hierarchy:
         ROLE_ADMIN: [ROLE_STAFF, ROLE_USER]
         ROLE_STAFF: ROLE_USER
@@ -25,7 +24,7 @@ security:
                 check_path: /api/login
                 username_path: email
                 password_path: password
-                success_handler: lexik_jwt_authentication.handler.authentication_success
+                success_handler: App\Security\JWTAuthenticationSuccessHandler
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
 
         api_register: 
@@ -39,9 +38,12 @@ security:
             jwt: ~
 
         main:
-            lazy: true
+            pattern: ^/
+            lazy: false  # CRITICAL: Must be false for OAuth to work
             provider: app_user_provider
-            custom_authenticator: App\Security\SecurityAuthenticator
+            custom_authenticators:
+                - App\Security\SecurityAuthenticator
+                - App\Security\GoogleAuthenticator
             user_checker: App\Security\UserChecker
             logout:
                 path: app_logout
@@ -51,8 +53,10 @@ security:
 
         # ========== API ROUTES ========== #
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
-        - { path: ^/api/me, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api/register, roles: PUBLIC_ACCESS }
+        - { path: ^/api/verify-email, roles: PUBLIC_ACCESS }
+        - { path: ^/api/resend-verification, roles: PUBLIC_ACCESS }
+        - { path: ^/api/me, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
         # ========== PUBLIC ROUTES (no login required) ========== #
@@ -61,25 +65,24 @@ security:
         - { path: ^/register$, roles: PUBLIC_ACCESS }
         - { path: ^/verify-email, roles: PUBLIC_ACCESS }
         - { path: ^/resend-verification, roles: PUBLIC_ACCESS }
+        - { path: ^/connect/google$, roles: PUBLIC_ACCESS }
+        - { path: ^/connect/google/check, roles: PUBLIC_ACCESS }
 
         # ========== ADMIN-ONLY ROUTES ========== #
-        # Staff CANNOT access these at all
-        - { path: ^/admin, roles: ROLE_ADMIN }                # Admin dashboard
-        - { path: ^/user, roles: ROLE_ADMIN }                 # User management
-        - { path: ^/activity-log, roles: ROLE_ADMIN }         # Activity logs
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/user, roles: ROLE_ADMIN }
+        - { path: ^/activity-log, roles: ROLE_ADMIN }
         
         # ========== STAFF & ADMIN ROUTES ========== #
-        # Both Admin and Staff can access these (CRUD operations)
-        - { path: ^/category, roles: [ROLE_ADMIN, ROLE_STAFF] }  # Category management
-        - { path: ^/customer, roles: [ROLE_ADMIN, ROLE_STAFF] }  # Customer management
-        - { path: ^/order, roles: [ROLE_ADMIN, ROLE_STAFF] }     # Order management
-        - { path: ^/product, roles: [ROLE_ADMIN, ROLE_STAFF] }   # Product management
-        - { path: ^/stock, roles: [ROLE_ADMIN, ROLE_STAFF] }     # Stock management
+        - { path: ^/category, roles: [ROLE_ADMIN, ROLE_STAFF] }
+        - { path: ^/customer, roles: [ROLE_ADMIN, ROLE_STAFF] }
+        - { path: ^/order, roles: [ROLE_ADMIN, ROLE_STAFF] }
+        - { path: ^/product, roles: [ROLE_ADMIN, ROLE_STAFF] }
+        - { path: ^/stock, roles: [ROLE_ADMIN, ROLE_STAFF] }
 
         # ========== ALL LOGGED IN USERS ========== #
-        - { path: ^/dashboard, roles: ROLE_USER }
-        - { path: ^/profile, roles: ROLE_USER }
-        - { path: ^/staff/dashboard, roles: ROLE_STAFF }
+        - { path: ^/dashboard, roles: [ROLE_USER, ROLE_STAFF, ROLE_ADMIN] }
+        - { path: ^/profile, roles: [ROLE_USER, ROLE_STAFF, ROLE_ADMIN] }
         
         # ========== FALLBACK - Require authentication for everything else ========== #
         - { path: ^/, roles: ROLE_USER }

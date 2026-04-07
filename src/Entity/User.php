@@ -10,11 +10,13 @@ use Symfony\Component\Security\Core\User\UserInterface;
 //api resource
 use Symfony\Component\Validator\Constraints as Assert;
 
+use Symfony\Component\Security\Core\User\EquatableInterface;
+
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
 #[ORM\HasLifecycleCallbacks]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface, EquatableInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -39,7 +41,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var string The hashed password
      */
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?string $password = null;
 
     #[ORM\Column(length: 100)]
@@ -88,11 +90,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $verificationToken = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $googleId = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $avatarUrl = null;
+
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $registrationSource = null;
+
     // Constructor
     public function __construct()
     {
         $this->createdAt = new \DateTime();
-        $this->roles = ['ROLE_USER']; // Default role
+        $this->roles = ['ROLE_USER']; // Default role includes ROLE_USER
         $this->isActive = true;
     }
 
@@ -195,11 +206,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getRoles(): array
     {
-        $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
-
-        return array_unique($roles);
+        return array_unique($this->roles);
     }
 
     /**
@@ -207,6 +214,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function setRoles(array $roles): static
     {
+        // Always ensure ROLE_USER is present in stored roles
+        if (!in_array('ROLE_USER', $roles)) {
+            $roles[] = 'ROLE_USER';
+        }
         $this->roles = $roles;
 
         return $this;
@@ -220,7 +231,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->password;
     }
 
-    public function setPassword(string $password): static
+    public function setPassword(?string $password): static
     {
         $this->password = $password;
 
@@ -265,11 +276,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * Ensure the session doesn't contain actual password hashes by CRC32C-hashing them, as supported since Symfony 7.3.
+     * Handle null passwords for OAuth users.
      */
     public function __serialize(): array
     {
         $data = (array) $this;
-        $data["\0".self::class."\0password"] = hash('crc32c', $this->password);
+        $passwordHash = $this->password ? hash('crc32c', $this->password) : 'null';
+        $data["\0".self::class."\0password"] = $passwordHash;
 
         return $data;
     }
@@ -301,5 +314,57 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->verificationToken = $verificationToken;
         return $this;
     }
-}
 
+    public function getGoogleId(): ?string
+    {
+        return $this->googleId;
+    }
+
+    public function setGoogleId(?string $googleId): static
+    {
+        $this->googleId = $googleId;
+
+        return $this;
+    }
+
+    public function getAvatarUrl(): ?string
+    {
+        return $this->avatarUrl;
+    }
+
+    public function setAvatarUrl(?string $avatarUrl): static
+    {
+        $this->avatarUrl = $avatarUrl;
+
+        return $this;
+    }
+
+    public function getRegistrationSource(): ?string
+    {
+        return $this->registrationSource;
+    }
+
+    public function setRegistrationSource(?string $registrationSource): static
+    {
+        $this->registrationSource = $registrationSource;
+
+        return $this;
+    }
+
+    /**
+     * Check if two users are equal - required for OAuth users with null passwords
+     */
+    public function isEqualTo(UserInterface $user): bool
+    {
+        if (!$user instanceof self) {
+            return false;
+        }
+
+        // For OAuth users, only compare essential fields
+        // Password can be null for OAuth users, so don't compare it
+        return $this->id === $user->getId()
+            && $this->email === $user->getEmail()
+            && $this->isActive === $user->isActive()
+            && $this->isVerified === $user->isVerified();
+    }
+}

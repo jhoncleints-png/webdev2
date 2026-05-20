@@ -172,6 +172,11 @@
             display: block;
         }
 
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #FFD700;
+        }
+
         .mobile-menu a {
             display: block;
             padding: 12px 16px;
@@ -181,7 +186,8 @@
             transition: color 0.3s;
         }
 
-        .mobile-menu a:hover {
+        .mobile-menu a:hover,
+        .mobile-menu a.active {
             color: #FFD700;
         }
 
@@ -778,14 +784,14 @@
         </a>
         
         <div class="nav-links">
-            <a href="{{ path('app_landing') }}">Home</a>
+            <a href="{{ path('app_landing') }}"class="active">Home</a>
             <a href="{{ path('app_about') }}">About</a>
             <a href="{{ path('app_contact') }}">Contact</a>
         </div>
         
-        <div class="nav-buttons">
-            <a href="{{ path('app_login') }}" class="btn-secondary" style="padding: 8px 20px;">Login</a>
-            <a href="{{ path('app_register') }}" class="btn-primary" style="padding: 8px 20px;">Get Started</a>
+        <div class="nav-links">
+            <a href="{{ path('app_login') }}" class="btn-secondary">Login</a>
+            <a href="{{ path('app_register') }}" class="btn-primary ">Get Started</a>
         </div>
         
         <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
@@ -794,9 +800,11 @@
 
 <!-- Mobile Menu -->
 <div class="mobile-menu" id="mobileMenu">
-    <a href="{{ path('app_landing') }}">Home</a>
+    <a href="{{ path('app_landing') }}"class="active">Home</a>
     <a href="{{ path('app_about') }}">About</a>
     <a href="{{ path('app_contact') }}">Contact</a>
+    <a href="{{ path('app_login')}}">Login</a>
+    <a href="{{ path('app_register')}}">Register</a>
 </div>
 
 <!-- Hero Section with Full Background Image -->

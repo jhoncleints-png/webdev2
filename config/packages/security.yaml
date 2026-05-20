@@ -47,7 +47,7 @@ security:
             user_checker: App\Security\UserChecker
             logout:
                 path: app_logout
-                target: app_login
+                target: app_landing
 
     access_control:
 
@@ -69,6 +69,8 @@ security:
         - { path: ^/resend-verification, roles: PUBLIC_ACCESS }
         - { path: ^/connect/google$, roles: PUBLIC_ACCESS }
         - { path: ^/connect/google/check, roles: PUBLIC_ACCESS }
+        - { path: ^/contact, roles: PUBLIC_ACCESS }
+        - { path: ^/about, roles: PUBLIC_ACCESS }
 
         # ========== ADMIN-ONLY ROUTES ========== #
         - { path: ^/admin, roles: ROLE_ADMIN }

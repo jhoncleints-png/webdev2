@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Product;
+use App\Entity\StockActivity;
 use App\Service\ActivityLogger;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -34,20 +35,28 @@ class StockController extends AbstractController
             $quantity = $request->request->getInt('quantity');
             $action = $request->request->get('action');
             $oldQuantity = $product->getStockQuantity();
-            
+            $newQuantity = $oldQuantity;
+            $actionType = '';
+            $quantityChange = 0;
+
             if ($action === 'add') {
-                $product->setStockQuantity($product->getStockQuantity() + $quantity);
+                $newQuantity = $product->getStockQuantity() + $quantity;
+                $product->setStockQuantity($newQuantity);
+                $actionType = 'added';
+                $quantityChange = $quantity;
                 $this->activityLogger->log(
                     $this->getUser(),
                     'STOCK_ADD',
                     'Product',
                     $product->getId(),
-                    "Added {$quantity} units to {$product->getName()}. Stock: {$oldQuantity} → {$product->getStockQuantity()}"
+                    "Added {$quantity} units to {$product->getName()}. Stock: {$oldQuantity} → {$newQuantity}"
                 );
             } elseif ($action === 'remove') {
                 $newQuantity = $product->getStockQuantity() - $quantity;
                 if ($newQuantity >= 0) {
                     $product->setStockQuantity($newQuantity);
+                    $actionType = 'removed';
+                    $quantityChange = -$quantity;
                     $this->activityLogger->log(
                         $this->getUser(),
                         'STOCK_REMOVE',
@@ -60,7 +69,10 @@ class StockController extends AbstractController
                     return $this->redirectToRoute('app_stock_index');
                 }
             } elseif ($action === 'set') {
-                $product->setStockQuantity($quantity);
+                $newQuantity = $quantity;
+                $product->setStockQuantity($newQuantity);
+                $actionType = 'adjusted';
+                $quantityChange = $newQuantity - $oldQuantity;
                 $this->activityLogger->log(
                     $this->getUser(),
                     'STOCK_SET',
@@ -69,7 +81,18 @@ class StockController extends AbstractController
                     "Set stock of {$product->getName()} to {$quantity} (was {$oldQuantity})"
                 );
             }
-            
+
+            // Create stock activity log
+            $stockActivity = new StockActivity();
+            $stockActivity->setProduct($product);
+            $stockActivity->setPerformedBy($this->getUser());
+            $stockActivity->setQuantityChange($quantityChange);
+            $stockActivity->setPreviousQuantity($oldQuantity);
+            $stockActivity->setNewQuantity($newQuantity);
+            $stockActivity->setActionType($actionType);
+            $stockActivity->setNotes("Stock {$actionType} by {$this->getUser()->getEmail()}");
+            $entityManager->persist($stockActivity);
+
             $product->setLastStockUpdate(new \DateTime());
             $entityManager->flush();
 

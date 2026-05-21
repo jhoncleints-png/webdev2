@@ -58,8 +58,17 @@ class Product
     #[ORM\OneToMany(targetEntity: OrderItem::class, mappedBy: 'product')]
     private Collection $orderItems;
 
+    /**
+     * @var Collection<int, StockActivity>
+     */
+    #[ORM\OneToMany(targetEntity: StockActivity::class, mappedBy: 'product')]
+    private Collection $stockActivities;
+
     #[ORM\Column]
     private ?int $stockQuantity = null;
+
+    #[ORM\Column(type: Types::BOOLEAN)]
+    private bool $isMixedDrink = false;
 
     #[ORM\Column(nullable: true)]
     private ?int $minimumStock = null;
@@ -71,6 +80,7 @@ class Product
     {
         $this->createdAt = new \DateTime();
         $this->orderItems = new ArrayCollection();
+        $this->stockActivities = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -180,6 +190,36 @@ class Product
         return $this;
     }
 
+    /**
+     * @return Collection<int, StockActivity>
+     */
+    public function getStockActivities(): Collection
+    {
+        return $this->stockActivities;
+    }
+
+    public function addStockActivity(StockActivity $stockActivity): static
+    {
+        if (!$this->stockActivities->contains($stockActivity)) {
+            $this->stockActivities->add($stockActivity);
+            $stockActivity->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeStockActivity(StockActivity $stockActivity): static
+    {
+        if ($this->stockActivities->removeElement($stockActivity)) {
+            // set the owning side to null (unless already changed)
+            if ($stockActivity->getProduct() === $this) {
+                $stockActivity->setProduct(null);
+            }
+        }
+
+        return $this;
+    }
+
     public function getStockQuantity(): ?int
     {
         return $this->stockQuantity;
@@ -212,6 +252,18 @@ class Product
     public function setLastStockUpdate(?\DateTime $lastStockUpdate): static
     {
         $this->lastStockUpdate = $lastStockUpdate;
+
+        return $this;
+    }
+
+    public function isMixedDrink(): bool
+    {
+        return $this->isMixedDrink;
+    }
+
+    public function setMixedDrink(bool $isMixedDrink): static
+    {
+        $this->isMixedDrink = $isMixedDrink;
 
         return $this;
     }

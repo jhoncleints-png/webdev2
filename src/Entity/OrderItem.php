@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\OrderItemRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: OrderItemRepository::class)]
 class OrderItem
@@ -16,16 +17,22 @@ class OrderItem
 
     #[ORM\ManyToOne(inversedBy: 'orderItems')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotNull(message: "Order is required.")]
     private ?Order $orderRelation = null;
 
     #[ORM\ManyToOne(inversedBy: 'orderItems')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotNull(message: "Product is required.")]
     private ?Product $product = null;
 
     #[ORM\Column]
+    #[Assert\NotNull(message: "Quantity is required.")]
+    #[Assert\Positive(message: "Quantity must be greater than 0.")]
     private ?int $quantity = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    #[Assert\NotNull(message: "Unit price is required.")]
+    #[Assert\Positive(message: "Unit price must be greater than 0.")]
     private ?string $unitPrice = null;
 
     public function getId(): ?int

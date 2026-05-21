@@ -3,8 +3,28 @@
 {% block title %}Dashboard - Samaco Brewery{% endblock %}
 
 {% block dashboard_content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6" data-user-id="{% if app.user %}{{ app.user.id }}{% endif %}">
     
+    <!-- Real-time Notification Banner -->
+    <div id="notification-banner" class="hidden fixed top-4 right-4 z-50 max-w-sm">
+        <div class="bg-gray-900 border-l-4 border-yellow-400 rounded-lg shadow-2xl p-4">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <span class="text-2xl">🔔</span>
+                </div>
+                <div class="ml-3 flex-1">
+                    <p id="notification-title" class="text-sm font-medium text-yellow-400"></p>
+                    <p id="notification-message" class="mt-1 text-sm text-gray-300"></p>
+                </div>
+                <button onclick="hideNotification()" class="ml-3 flex-shrink-0 text-gray-400 hover:text-white">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Page Header -->
     <div class="bg-gradient-to-r from-black to-gray-900 rounded-xl sm:rounded-2xl border-l-4 border-yellow-400 p-4 sm:p-6 mb-6 sm:mb-8 shadow-xl">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -356,5 +376,51 @@
         }
         updateLastUpdated();
         setInterval(updateLastUpdated, 60000);
+
+        // Notification Banner Functions
+        function showNotification(title, message) {
+            const banner = document.getElementById('notification-banner');
+            const titleElem = document.getElementById('notification-title');
+            const messageElem = document.getElementById('notification-message');
+            
+            titleElem.textContent = title;
+            messageElem.textContent = message;
+            banner.classList.remove('hidden');
+            
+            // Auto-hide after 5 seconds
+            setTimeout(hideNotification, 5000);
+        }
+
+        function hideNotification() {
+            const banner = document.getElementById('notification-banner');
+            banner.classList.add('hidden');
+        }
+
+        // Mercure WebSocket Connection for Real-time Notifications
+        (function() {
+            const dashboard = document.querySelector('[data-user-id]');
+            if (!dashboard) return;
+            
+            const userId = dashboard.getAttribute('data-user-id');
+            if (!userId) return;
+            
+            const mercureUrl = 'http://127.0.0.1:3000/.well-known/mercure';
+            const eventSource = new EventSource(mercureUrl + '?topic=/orders/' + userId + '&topic=/activity/' + userId);
+
+            eventSource.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                
+                if (data.type === 'orders_sync') {
+                    showNotification('New Order', 'A new order has been placed!');
+                } else if (data.type === 'activity_sync') {
+                    showNotification('Activity Update', 'New activity detected in the system.');
+                }
+            };
+
+            eventSource.onerror = (error) => {
+                console.error('Mercure connection error:', error);
+                eventSource.close();
+            };
+        })();
     </script>
 {% endblock %}

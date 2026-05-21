@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ORM\Table(name: '`order`')]
@@ -19,15 +20,21 @@ class Order
 
     #[ORM\ManyToOne(inversedBy: 'orders')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotNull(message: "Customer is required.")]
     private ?Customer $customer = null;
 
     #[ORM\Column]
+    #[Assert\NotNull(message: "Order date is required.")]
     private ?\DateTime $orderDate = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    #[Assert\NotNull(message: "Total amount is required.")]
+    #[Assert\Positive(message: "Total amount must be greater than 0.")]
     private ?string $totalAmount = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message: "Status is required.")]
+    #[Assert\Choice(choices: [self::STATUS_PENDING, self::STATUS_DELIVERED, self::STATUS_CANCELLED], message: "Invalid status.")]
     private ?string $status = null;
 
     #[ORM\Column(length: 50)]

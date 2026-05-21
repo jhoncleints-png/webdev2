@@ -24,7 +24,7 @@ COPY nginx-main.conf /etc/nginx/nginx.conf
 
 # PHP deps first (vendor/ is required for @symfony/ux-turbo npm file: dependency)
 RUN COMPOSER_ALLOW_SUPERUSER=1 composer install \
-    --no-interaction --no-dev --optimize-autoloader
+    --no-interaction --no-dev --optimize-autoloader --no-scripts
 
 # Install all npm deps (including devDependencies for webpack/encore)
 ENV NPM_CONFIG_PRODUCTION=false
@@ -37,6 +37,9 @@ RUN npm run build \
     || (echo "ERROR: Webpack build did not produce public/build/entrypoints.json" && exit 1)
 
 RUN rm -rf node_modules
+
+# Create .env from .env.example for build-time commands
+RUN cp .env.example .env || echo "APP_ENV=prod\nAPP_DEBUG=0" > .env
 
 RUN php bin/console cache:clear --env=prod --no-debug
 

@@ -1,3 +1,4 @@
+# Cache bust: force fresh build - 2026-05-21
 FROM php:8.3-fpm
 
 WORKDIR /var/www/html

@@ -1,14 +1,15 @@
-this im gonna push this
-
 FROM php:8.3-fpm
 
 WORKDIR /var/www/html
 
 # System dependencies + Node.js (required for Webpack Encore at build time)
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     git curl zip unzip \
-    icu-dev libxml2-dev oniguruma-dev \
-    nginx gettext ca-certificates nodejs npm
+    libicu-dev libxml2-dev libonig-dev \
+    nginx gettext-base ca-certificates gnupg \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN docker-php-ext-install intl xml pdo pdo_mysql mbstring opcache
 

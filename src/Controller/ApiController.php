@@ -83,6 +83,7 @@ class ApiController extends AbstractController
                     'price' => $product->getPrice(),
                     'stockQuantity' => $product->getStockQuantity(),
                     'minimumStock' => $product->getMinimumStock(),
+                    'isMixedDrink' => $product->isMixedDrink(),
                     'category' => $product->getCategory() ? [
                         'id' => $product->getCategory()->getId(),
                         'name' => $product->getCategory()->getName(),
@@ -166,6 +167,7 @@ class ApiController extends AbstractController
                         'id' => $product->getId(),
                         'name' => $product->getName(),
                         'price' => $product->getPrice(),
+                        'isMixedDrink' => $product->isMixedDrink(),
                     ];
                 }
 
@@ -206,6 +208,7 @@ class ApiController extends AbstractController
                 'price' => $product->getPrice(),
                 'stockQuantity' => $product->getStockQuantity(),
                 'minimumStock' => $product->getMinimumStock(),
+                'isMixedDrink' => $product->isMixedDrink(),
                 'category' => $product->getCategory() ? [
                     'id' => $product->getCategory()->getId(),
                     'name' => $product->getCategory()->getName(),
@@ -295,6 +298,7 @@ class ApiController extends AbstractController
                     'description' => $product->getDescription(),
                     'price' => $product->getPrice(),
                     'stockQuantity' => $product->getStockQuantity(),
+                    'isMixedDrink' => $product->isMixedDrink(),
                 ];
             }
 
@@ -413,6 +417,7 @@ class ApiController extends AbstractController
                     'description' => $product->getDescription(),
                     'price' => $product->getPrice(),
                     'stockQuantity' => $product->getStockQuantity(),
+                    'isMixedDrink' => $product->isMixedDrink(),
                     'category' => $product->getCategory() ? [
                         'id' => $product->getCategory()->getId(),
                         'name' => $product->getCategory()->getName(),

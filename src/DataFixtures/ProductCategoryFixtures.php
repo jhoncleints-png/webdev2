@@ -257,6 +257,80 @@ class ProductCategoryFixtures extends Fixture implements DependentFixtureInterfa
                 'stock' => 220,
                 'minStock' => 22,
             ],
+
+            // Mixed Drinks
+            [
+                'name' => 'San Mig Light Mix',
+                'description' => 'Refreshing mix of San Miguel Light with calamansi juice and soda water. A light and citrusy Filipino cocktail.',
+                'price' => 85.00,
+                'category' => 'Local Craft Beers',
+                'stock' => 150,
+                'minStock' => 15,
+                'isMixedDrink' => true,
+            ],
+            [
+                'name' => 'Red Horse Mojito',
+                'description' => 'Bold Red Horse beer mixed with fresh mint, lime, and a splash of rum. A strong twist on the classic mojito.',
+                'price' => 95.00,
+                'category' => 'Local Craft Beers',
+                'stock' => 120,
+                'minStock' => 12,
+                'isMixedDrink' => true,
+            ],
+            [
+                'name' => 'Beer Margarita',
+                'description' => 'Classic margarita made with Filipino lager beer instead of tequila. A unique beer cocktail experience.',
+                'price' => 90.00,
+                'category' => 'Filipino Lagers',
+                'stock' => 130,
+                'minStock' => 13,
+                'isMixedDrink' => true,
+            ],
+            [
+                'name' => 'Shandy Gaff',
+                'description' => 'Traditional beer cocktail mixing light beer with ginger ale. Refreshing and easy-drinking.',
+                'price' => 75.00,
+                'category' => 'Filipino Lagers',
+                'stock' => 140,
+                'minStock' => 14,
+                'isMixedDrink' => true,
+            ],
+            [
+                'name' => 'Michelada Filipino',
+                'description' => 'Spicy beer cocktail with lime, tomato juice, hot sauce, and rimmed with salt and chili powder. A Filipino twist on the Mexican classic.',
+                'price' => 88.00,
+                'category' => 'Seasonal Specials',
+                'stock' => 100,
+                'minStock' => 10,
+                'isMixedDrink' => true,
+            ],
+            [
+                'name' => 'Beer Punch',
+                'description' => 'Fruity beer punch mixed with tropical fruit juices, soda, and a splash of rum. Perfect for parties.',
+                'price' => 110.00,
+                'category' => 'Seasonal Specials',
+                'stock' => 80,
+                'minStock' => 8,
+                'isMixedDrink' => true,
+            ],
+            [
+                'name' => 'Mango Beer Cocktail',
+                'description' => 'Sweet mango puree mixed with light beer and a touch of lime. A tropical Filipino beer cocktail.',
+                'price' => 92.00,
+                'category' => 'Seasonal Specials',
+                'stock' => 90,
+                'minStock' => 9,
+                'isMixedDrink' => true,
+            ],
+            [
+                'name' => 'Cerveza Preparada',
+                'description' => 'Prepared beer with lime, Worcestershire sauce, hot sauce, and tomato juice. A savory beer cocktail.',
+                'price' => 85.00,
+                'category' => 'Seasonal Specials',
+                'stock' => 110,
+                'minStock' => 11,
+                'isMixedDrink' => true,
+            ],
         ];
 
         foreach ($products as $productData) {
@@ -271,7 +345,8 @@ class ProductCategoryFixtures extends Fixture implements DependentFixtureInterfa
                 $product->setStockQuantity($productData['stock']);
                 $product->setMinimumStock($productData['minStock']);
                 $product->setLastStockUpdate(new \DateTime());
-                
+                $product->setMixedDrink($productData['isMixedDrink'] ?? false);
+
                 $manager->persist($product);
             }
         }

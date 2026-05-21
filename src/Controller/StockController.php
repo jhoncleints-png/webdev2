@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Product;
-use App\Entity\StockActivity;
+use App\Entity\ActivityLog;
 use App\Service\ActivityLogger;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -23,8 +23,19 @@ class StockController extends AbstractController
     {
         $products = $entityManager->getRepository(Product::class)->findAll();
 
+        // Fetch stock-related activity logs
+        $stockActivities = $entityManager->getRepository(ActivityLog::class)
+            ->createQueryBuilder('a')
+            ->where('a.action LIKE :stockAction')
+            ->setParameter('stockAction', 'STOCK_%')
+            ->orderBy('a.createdAt', 'DESC')
+            ->setMaxResults(100)
+            ->getQuery()
+            ->getResult();
+
         return $this->render('stock/index.html.twig', [
             'products' => $products,
+            'stockActivities' => $stockActivities,
         ]);
     }
     
@@ -35,28 +46,20 @@ class StockController extends AbstractController
             $quantity = $request->request->getInt('quantity');
             $action = $request->request->get('action');
             $oldQuantity = $product->getStockQuantity();
-            $newQuantity = $oldQuantity;
-            $actionType = '';
-            $quantityChange = 0;
 
             if ($action === 'add') {
-                $newQuantity = $product->getStockQuantity() + $quantity;
-                $product->setStockQuantity($newQuantity);
-                $actionType = 'added';
-                $quantityChange = $quantity;
+                $product->setStockQuantity($product->getStockQuantity() + $quantity);
                 $this->activityLogger->log(
                     $this->getUser(),
                     'STOCK_ADD',
                     'Product',
                     $product->getId(),
-                    "Added {$quantity} units to {$product->getName()}. Stock: {$oldQuantity} → {$newQuantity}"
+                    "Added {$quantity} units to {$product->getName()}. Stock: {$oldQuantity} → {$product->getStockQuantity()}"
                 );
             } elseif ($action === 'remove') {
                 $newQuantity = $product->getStockQuantity() - $quantity;
                 if ($newQuantity >= 0) {
                     $product->setStockQuantity($newQuantity);
-                    $actionType = 'removed';
-                    $quantityChange = -$quantity;
                     $this->activityLogger->log(
                         $this->getUser(),
                         'STOCK_REMOVE',
@@ -69,10 +72,7 @@ class StockController extends AbstractController
                     return $this->redirectToRoute('app_stock_index');
                 }
             } elseif ($action === 'set') {
-                $newQuantity = $quantity;
-                $product->setStockQuantity($newQuantity);
-                $actionType = 'adjusted';
-                $quantityChange = $newQuantity - $oldQuantity;
+                $product->setStockQuantity($quantity);
                 $this->activityLogger->log(
                     $this->getUser(),
                     'STOCK_SET',
@@ -81,17 +81,6 @@ class StockController extends AbstractController
                     "Set stock of {$product->getName()} to {$quantity} (was {$oldQuantity})"
                 );
             }
-
-            // Create stock activity log
-            $stockActivity = new StockActivity();
-            $stockActivity->setProduct($product);
-            $stockActivity->setPerformedBy($this->getUser());
-            $stockActivity->setQuantityChange($quantityChange);
-            $stockActivity->setPreviousQuantity($oldQuantity);
-            $stockActivity->setNewQuantity($newQuantity);
-            $stockActivity->setActionType($actionType);
-            $stockActivity->setNotes("Stock {$actionType} by {$this->getUser()->getEmail()}");
-            $entityManager->persist($stockActivity);
 
             $product->setLastStockUpdate(new \DateTime());
             $entityManager->flush();

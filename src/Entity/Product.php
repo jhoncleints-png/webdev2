@@ -58,12 +58,6 @@ class Product
     #[ORM\OneToMany(targetEntity: OrderItem::class, mappedBy: 'product')]
     private Collection $orderItems;
 
-    /**
-     * @var Collection<int, StockActivity>
-     */
-    #[ORM\OneToMany(targetEntity: StockActivity::class, mappedBy: 'product')]
-    private Collection $stockActivities;
-
     #[ORM\Column]
     private ?int $stockQuantity = null;
 
@@ -80,7 +74,6 @@ class Product
     {
         $this->createdAt = new \DateTime();
         $this->orderItems = new ArrayCollection();
-        $this->stockActivities = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -184,36 +177,6 @@ class Product
             // set the owning side to null (unless already changed)
             if ($orderItem->getProduct() === $this) {
                 $orderItem->setProduct(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, StockActivity>
-     */
-    public function getStockActivities(): Collection
-    {
-        return $this->stockActivities;
-    }
-
-    public function addStockActivity(StockActivity $stockActivity): static
-    {
-        if (!$this->stockActivities->contains($stockActivity)) {
-            $this->stockActivities->add($stockActivity);
-            $stockActivity->setProduct($this);
-        }
-
-        return $this;
-    }
-
-    public function removeStockActivity(StockActivity $stockActivity): static
-    {
-        if ($this->stockActivities->removeElement($stockActivity)) {
-            // set the owning side to null (unless already changed)
-            if ($stockActivity->getProduct() === $this) {
-                $stockActivity->setProduct(null);
             }
         }
 

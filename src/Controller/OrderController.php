@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\Order;
 use App\Entity\OrderItem;
 use App\Entity\Product;
-use App\Entity\StockActivity;
 use App\Form\OrderType;
 use App\Repository\OrderRepository;
 use App\Service\ActivityLogger;
@@ -42,22 +41,10 @@ final class OrderController extends AbstractController
             } else {
                 // Deduct stock
                 $oldStock = $product->getStockQuantity();
-                $newStock = $oldStock - $quantity;
-                $product->setStockQuantity($newStock);
+                $product->setStockQuantity($oldStock - $quantity);
                 $product->setLastStockUpdate(new \DateTime());
 
-                // Create stock activity log
-                $stockActivity = new StockActivity();
-                $stockActivity->setProduct($product);
-                $stockActivity->setPerformedBy($this->getUser());
-                $stockActivity->setQuantityChange(-$quantity);
-                $stockActivity->setPreviousQuantity($oldStock);
-                $stockActivity->setNewQuantity($newStock);
-                $stockActivity->setActionType('removed');
-                $stockActivity->setNotes("Stock deducted for order #{$order->getOrderNumber()}");
-                $entityManager->persist($stockActivity);
-
-                $stockUpdates[] = "{$product->getName()}: {$oldStock} → {$newStock}";
+                $stockUpdates[] = "{$product->getName()}: {$oldStock} → {$product->getStockQuantity()}";
             }
         }
 
@@ -74,22 +61,10 @@ final class OrderController extends AbstractController
         foreach ($order->getOrderItems() as $item) {
             $product = $item->getProduct();
             $oldStock = $product->getStockQuantity();
-            $newStock = $oldStock + $item->getQuantity();
-            $product->setStockQuantity($newStock);
+            $product->setStockQuantity($oldStock + $item->getQuantity());
             $product->setLastStockUpdate(new \DateTime());
 
-            // Create stock activity log
-            $stockActivity = new StockActivity();
-            $stockActivity->setProduct($product);
-            $stockActivity->setPerformedBy($this->getUser());
-            $stockActivity->setQuantityChange($item->getQuantity());
-            $stockActivity->setPreviousQuantity($oldStock);
-            $stockActivity->setNewQuantity($newStock);
-            $stockActivity->setActionType('added');
-            $stockActivity->setNotes("Stock restored for order #{$order->getOrderNumber()}");
-            $entityManager->persist($stockActivity);
-
-            $stockUpdates[] = "{$product->getName()}: {$oldStock} → {$newStock}";
+            $stockUpdates[] = "{$product->getName()}: {$oldStock} → {$product->getStockQuantity()}";
         }
 
         return $stockUpdates;

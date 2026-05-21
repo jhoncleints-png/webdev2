@@ -6,17 +6,21 @@ export PORT=${PORT:-8080}
 
 echo "Starting entrypoint, PORT=$PORT"
 
-# Fix permissions
+# Fix permissions (in case they got reset)
 if [ -d /var/www/html/var ]; then
   chmod -R 777 /var/www/html/var || true
   chown -R www-data:www-data /var/www/html/var || true
 fi
 
-# Install JS assets if Symfony binary exists
+if [ -d /var/www/html/public/build ]; then
+  chmod -R 777 /var/www/html/public/build || true
+fi
+
+# Run migrations if needed
 if [ -f bin/console ]; then
-  php bin/console importmap:install || true
+  php bin/console doctrine:migrations:migrate --no-interaction --env=prod --allow-no-migration || true
+  # Clear cache again to ensure fresh state
   php bin/console cache:clear --env=prod --no-debug || true
-  php bin/console doctrine:migrations:migrate --no-interaction --env=prod || true
 fi
 
 # Start PHP-FPM

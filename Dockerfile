@@ -1,3 +1,5 @@
+this im gonna push this
+
 FROM php:8.3-fpm
 
 WORKDIR /var/www/html
@@ -39,19 +41,32 @@ RUN curl -sS https://getcomposer.org/installer | php -- \
 # Copy project files
 COPY . .
 
-# Install Composer dependencies FIRST (creates vendor directory for local npm packages)
+# Debug: List files before build
+RUN ls -la && echo "=== Checking for package.json ===" && cat package.json | head -5
+
+# Install Composer dependencies FIRST
 RUN if [ -f composer.json ]; then \
     COMPOSER_ALLOW_SUPERUSER=1 composer install --no-interaction --no-dev --optimize-autoloader; \
     fi
 
-# Install Node dependencies (vendor directory now exists for symfony/ux-turbo)
+# Debug: Check if vendor directory exists
+RUN if [ -d vendor/symfony ]; then ls -la vendor/symfony/; else echo "vendor/symfony directory not found yet"; fi
+
+# Install Node dependencies
 RUN if [ -f package.json ]; then \
+    echo "=== Installing NPM dependencies ===" && \
     npm ci --no-audit --no-fund || npm install; \
     fi
 
+# Debug: Check node_modules
+RUN ls -la node_modules/ | head -10
+
 # Build Webpack assets
 RUN if [ -f package.json ]; then \
-    npm run build; \
+    echo "=== Building Webpack assets ===" && \
+    npm run build && \
+    echo "=== Build completed ===" && \
+    ls -la public/build/; \
     fi
 
 # Clear cache

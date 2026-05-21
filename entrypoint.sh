@@ -29,6 +29,14 @@ fi
 if [ -f bin/console ]; then
   php bin/console doctrine:migrations:migrate --no-interaction --env=prod --allow-no-migration || true
   php bin/console cache:clear --env=prod --no-debug || true
+  
+  # Load fixtures if database is empty (no products)
+  php bin/console doctrine:query:dql "SELECT COUNT(p.id) FROM App\Entity\Product p" --env=prod > /tmp/product_count.txt 2>&1 || true
+  PRODUCT_COUNT=$(cat /tmp/product_count.txt | grep -oP '\d+' || echo "0")
+  if [ "$PRODUCT_COUNT" = "0" ]; then
+    echo "Database empty - loading fixtures..."
+    php bin/console doctrine:fixtures:load --no-interaction --env=prod || true
+  fi
 fi
 
 php-fpm -D

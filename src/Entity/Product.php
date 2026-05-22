@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
@@ -15,9 +16,11 @@ class Product
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['product:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
+    #[Groups(['product:read'])]
     #[Assert\NotBlank(message: "Product name is required.")]
     #[Assert\Length(
         min: 2,
@@ -28,6 +31,7 @@ class Product
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['product:read'])]
     #[Assert\NotBlank(message: "Description is required.")]
     #[Assert\Length(
         min: 10,
@@ -36,12 +40,14 @@ class Product
     private ?string $description = null;
 
     #[ORM\Column]
+    #[Groups(['product:read'])]
     #[Assert\NotBlank(message: "Price is required.")]
     #[Assert\Type(type: 'float', message: "Price must be a number.")]
     #[Assert\Positive(message: "Price must be greater than 0.")]
     private ?float $price = null;
 
     #[ORM\ManyToOne(inversedBy: 'products')]
+    #[Groups(['product:read'])]
     #[Assert\NotNull(message: "Please select a category.")]
     private ?Category $category = null;
 
@@ -59,9 +65,11 @@ class Product
     private Collection $orderItems;
 
     #[ORM\Column]
+    #[Groups(['product:read'])]
     private ?int $stockQuantity = null;
 
     #[ORM\Column(type: Types::BOOLEAN)]
+    #[Groups(['product:read'])]
     private bool $isMixedDrink = false;
 
     #[ORM\Column(nullable: true)]

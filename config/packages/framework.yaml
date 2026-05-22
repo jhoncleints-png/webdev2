@@ -1,7 +1,7 @@
 # see https://symfony.com/doc/current/reference/configuration/framework.html
 framework:
     secret: '%env(APP_SECRET)%'
-
+    
     # Note that the session will be started ONLY if you read or write from it.
     trusted_proxies: '%env(TRUSTED_PROXIES)%'
     trusted_headers:
@@ -9,11 +9,16 @@ framework:
         - 'x-forwarded-proto'
         - 'x-forwarded-port'
         - 'x-forwarded-host'
-
+    
     session:
         enabled: true
         cookie_secure: auto
         cookie_samesite: lax
+    
+    router:
+        http_port: 80
+        https_port: 443
+        default_uri: '%env(APP_URL)%'
 
 when@test:
     framework:

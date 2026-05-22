@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class GoogleOAuthController extends AbstractController
 {
@@ -14,11 +15,16 @@ class GoogleOAuthController extends AbstractController
     public function connectAction(ClientRegistry $clientRegistry): Response
     {
         // For web browser OAuth flow
-        return $clientRegistry
-            ->getClient('google')
-            ->redirect([
-                'openid', 'email', 'profile'
-            ]);
+        $client = $clientRegistry->getClient('google');
+        
+        // Debug: Log the redirect URI being used
+        $redirectUri = $this->generateUrl('connect_google_check', [], UrlGeneratorInterface::ABSOLUTE_URL);
+        error_log('Google OAuth Redirect URI: ' . $redirectUri);
+        error_log('Google OAuth Client ID: ' . $_ENV['GOOGLE_CLIENT_ID'] ?? 'not set');
+        
+        return $client->redirect([
+            'openid', 'email', 'profile'
+        ]);
     }
 
     #[Route('/connect/google/check', name: 'connect_google_check')]

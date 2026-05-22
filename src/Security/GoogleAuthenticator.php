@@ -15,6 +15,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
+use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 
 class GoogleAuthenticator extends OAuth2Authenticator
 {
@@ -37,98 +38,127 @@ class GoogleAuthenticator extends OAuth2Authenticator
 
     public function supports(Request $request): ?bool
     {
-        $route = $request->attributes->get('_route');
-        $this->logger->info('GoogleAuthenticator::supports() called', [
-            'route' => $route,
-            'expected' => 'connect_google_check',
-            'matches' => $route === 'connect_google_check',
-            'path' => $request->getPathInfo(),
-            'query' => $request->query->all(),
-        ]);
-        
-        // Support both GET and POST for OAuth callback
-        if ($route !== 'connect_google_check') {
-            return false;
-        }
-        
-        // Check for OAuth parameters
-        $hasCode = $request->query->has('code') || $request->request->has('code');
-        $hasState = $request->query->has('state') || $request->request->has('state');
-        
-        $this->logger->info('OAuth params check', ['has_code' => $hasCode, 'has_state' => $hasState]);
-        
-        return $hasCode; // Need authorization code to proceed
+        // Only handle the OAuth callback route
+        return $request->attributes->get('_route') === 'connect_google_check';
     }
 
     public function authenticate(Request $request): SelfValidatingPassport
     {
-        $client = $this->clientRegistry->getClient('google');
-        $accessToken = $this->fetchAccessToken($client);
-
-        return new SelfValidatingPassport(
-            new UserBadge($accessToken->getToken(), function() use ($accessToken, $client) {
-                $googleUser = $client->fetchUserFromToken($accessToken);
-                
-                $user = $this->entityManager->getRepository(User::class)
-                    ->findOneBy(['email' => $googleUser->getEmail()]);
-                
-                if (!$user) {
-                    $user = new User();
-                    $user->setEmail($googleUser->getEmail());
-                    $user->setFirstName($googleUser->getFirstName() ?? 'Google');
-                    $user->setLastName($googleUser->getLastName() ?? 'User');
-                    $user->setGoogleId($googleUser->getId());
-                    // Assign STAFF role for Google login users
-                    $user->setRoles(['ROLE_USER', 'ROLE_STAFF']);
-                    // Google emails are pre-verified
-                    $user->setIsVerified(true);
-                    
-                    $this->entityManager->persist($user);
-                } else {
-                    // If user exists but doesn't have STAFF role, add it
-                    $roles = $user->getRoles();
-                    if (!in_array('ROLE_STAFF', $roles)) {
-                        $roles[] = 'ROLE_STAFF';
-                        $user->setRoles($roles);
+        $this->logger->info('Starting Google authentication');
+        
+        try {
+            // Get the Google client
+            $client = $this->clientRegistry->getClient('google');
+            
+            // This will automatically handle the code exchange
+            $accessToken = $this->fetchAccessToken($client);
+            
+            $this->logger->info('Access token obtained', [
+                'token' => substr($accessToken->getToken(), 0, 20) . '...'
+            ]);
+            
+            return new SelfValidatingPassport(
+                new UserBadge($accessToken->getToken(), function() use ($accessToken, $client) {
+                    try {
+                        // Fetch user from Google
+                        $googleUser = $client->fetchUserFromToken($accessToken);
+                        
+                        $this->logger->info('Google user fetched', [
+                            'email' => $googleUser->getEmail(),
+                            'name' => $googleUser->getName()
+                        ]);
+                        
+                        // Find or create user in database
+                        $user = $this->entityManager->getRepository(User::class)
+                            ->findOneBy(['email' => $googleUser->getEmail()]);
+                        
+                        if (!$user) {
+                            $user = new User();
+                            $user->setEmail($googleUser->getEmail());
+                            $user->setFirstName($googleUser->getFirstName() ?? '');
+                            $user->setLastName($googleUser->getLastName() ?? '');
+                            $user->setGoogleId($googleUser->getId());
+                            $user->setRoles(['ROLE_USER', 'ROLE_STAFF']);
+                            $user->setIsVerified(true);
+                            
+                            $this->entityManager->persist($user);
+                            $this->logger->info('New user created', ['email' => $user->getEmail()]);
+                        } else {
+                            // Update existing user's Google ID if not set
+                            if (!$user->getGoogleId()) {
+                                $user->setGoogleId($googleUser->getId());
+                            }
+                            
+                            // Ensure STAFF role
+                            $roles = $user->getRoles();
+                            if (!in_array('ROLE_STAFF', $roles)) {
+                                $roles[] = 'ROLE_STAFF';
+                                $user->setRoles($roles);
+                            }
+                            
+                            $user->setIsVerified(true);
+                            $this->logger->info('Existing user updated', ['email' => $user->getEmail()]);
+                        }
+                        
+                        $this->entityManager->flush();
+                        
+                        return $user;
+                        
+                    } catch (IdentityProviderException $e) {
+                        $this->logger->error('Failed to fetch Google user', [
+                            'error' => $e->getMessage(),
+                            'response' => $e->getResponseBody()
+                        ]);
+                        throw $e;
                     }
-                    // Ensure Google users are marked as verified
-                    if (!$user->isVerified()) {
-                        $user->setIsVerified(true);
-                    }
-                }
-                
-                $this->entityManager->flush();
-                
-                return $user;
-            })
-        );
+                })
+            );
+            
+        } catch (\Exception $e) {
+            $this->logger->error('Authentication exception', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw new AuthenticationException('Google authentication failed: ' . $e->getMessage());
+        }
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
-        $this->logger->info('Google OAuth success - redirecting to dashboard', [
-            'user' => $token->getUserIdentifier(),
-            'roles' => $token->getRoleNames(),
-        ]);
+        $this->logger->info('Google OAuth success');
         
-        // Create redirect response
-        $response = new RedirectResponse('/dashboard');
+        // Check if this is an API request (from React Native)
+        if ($request->headers->get('Accept') === 'application/json' || 
+            $request->headers->get('Content-Type') === 'application/json') {
+            // Return JSON response for mobile app
+            return new Response(json_encode([
+                'success' => true,
+                'message' => 'Authentication successful',
+                'redirect' => '/dashboard'
+            ]), Response::HTTP_OK, ['Content-Type' => 'application/json']);
+        }
         
-        $this->logger->info('Redirect response created', [
-            'target' => '/dashboard',
-            'status' => $response->getStatusCode(),
-        ]);
-        
-        return $response;
+        // Web request - redirect to dashboard
+        return new RedirectResponse($this->router->generate('dashboard'));
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
-        $this->logger->error('Google OAuth authentication failed', [
-            'message' => $exception->getMessage(),
-            'path' => $request->getPathInfo(),
+        $this->logger->error('Google OAuth failed', [
+            'message' => $exception->getMessage()
         ]);
         
+        // Check if this is an API request (from React Native)
+        if ($request->headers->get('Accept') === 'application/json' || 
+            $request->headers->get('Content-Type') === 'application/json') {
+            // Return JSON error for mobile app
+            return new Response(json_encode([
+                'success' => false,
+                'error' => $exception->getMessage()
+            ]), Response::HTTP_UNAUTHORIZED, ['Content-Type' => 'application/json']);
+        }
+        
+        // Web request - redirect to login
         return new RedirectResponse($this->router->generate('app_login'));
     }
 }

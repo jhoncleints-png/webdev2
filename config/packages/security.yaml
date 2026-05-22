@@ -39,12 +39,11 @@ security:
 
         main:
             pattern: ^/
-            lazy: false  # CRITICAL: Must be false for OAuth to work
+            lazy: false
             provider: app_user_provider
             custom_authenticators:
-                - App\Security\SecurityAuthenticator
-                - App\Security\GoogleAuthenticator
-            user_checker: App\Security\UserChecker
+                - App\Security\GoogleAuthenticator  # For web OAuth
+                # Not: App\Security\SecurityAuthenticator (that's for email login)
             logout:
                 path: app_logout
                 target: app_landing

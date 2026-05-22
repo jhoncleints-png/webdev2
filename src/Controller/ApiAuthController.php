@@ -40,7 +40,7 @@ class ApiAuthController extends AbstractController
             $payload = $response->toArray();
             
             // Verify the token is for your app
-            $googleClientId = $_ENV['GOOGLE_CLIENT_ID'] ?? null;
+            $googleClientId = $_ENV['GOOGLE_CLIENT_ID'] ?? $_ENV['OAUTH_GOOGLE_CLIENT_ID'] ?? null;
             if ($googleClientId && ($payload['aud'] !== $googleClientId)) {
                 return $this->json(['error' => 'Token audience mismatch'], 401);
             }

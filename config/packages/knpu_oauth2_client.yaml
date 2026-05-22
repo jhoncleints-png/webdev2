@@ -1,10 +1,13 @@
-knpu_oauth2_client:
-    clients:
-        google:
-            type: google
-            client_id: '%env(string:OAUTH_GOOGLE_CLIENT_ID:)%'
-            client_secret: '%env(string:OAUTH_GOOGLE_CLIENT_SECRET:)%'
-            redirect_route: connect_google_check
-            redirect_params: {}
-            # Allow missing environment variables for API-only deployment
-            use_state: true
+# Google OAuth client configuration
+# Only needed for web-based Google login
+# React Native app uses /api/auth/google endpoint instead
+# Uncomment and configure if web OAuth flow is needed
+# knpu_oauth2_client:
+#     clients:
+#         google:
+#             type: google
+#             client_id: '%env(OAUTH_GOOGLE_CLIENT_ID)%'
+#             client_secret: '%env(OAUTH_GOOGLE_CLIENT_SECRET)%'
+#             redirect_route: connect_google_check
+#             redirect_params: {}
+#             use_state: true

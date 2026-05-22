@@ -27,15 +27,31 @@ class SecurityAuthenticator extends AbstractLoginFormAuthenticator
 
     public function authenticate(Request $request): Passport
     {
-        $email = $request->getPayload()->getString('email');
+        $email = '';
+        $password = '';
+        $csrfToken = '';
+
+        // Try JSON body first, fallback to form-encoded
+        $contentType = $request->getContentType();
+        if ($contentType === 'json' || $request->headers->get('Content-Type') === 'application/json') {
+            $data = json_decode($request->getContent(), true) ?? [];
+            $email = $data['email'] ?? $request->get('email', '');
+            $password = $data['password'] ?? $request->get('password', '');
+            $csrfToken = $data['_csrf_token'] ?? $request->get('_csrf_token', '');
+        } else {
+            $email = $request->request->get('email', $request->get('email', ''));
+            $password = $request->request->get('password', $request->get('password', ''));
+            $csrfToken = $request->request->get('_csrf_token', $request->get('_csrf_token', ''));
+        }
 
         $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $email);
 
         return new Passport(
             new UserBadge($email),
-            new PasswordCredentials($request->getPayload()->getString('password')),
+            new PasswordCredentials($password),
             [
-                new CsrfTokenBadge('authenticate', $request->getPayload()->getString('_csrf_token')),            ]
+                new CsrfTokenBadge('authenticate', $csrfToken),
+            ]
         );
     }
 

@@ -19,7 +19,7 @@
             </p>
         </div>
         
-        <form class="mt-8 space-y-6" method="post">
+        <form class="mt-8 space-y-6" method="post" action="{{ path('app_login') }}">
             {% if error %}
                 <div class="rounded-md bg-red-900/50 p-4 border border-red-500">
                     <div class="text-sm text-red-200">{{ error.messageKey|trans(error.messageData, 'security')|raw }}</div>

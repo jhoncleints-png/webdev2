@@ -41,6 +41,10 @@ security:
             pattern: ^/
             lazy: false
             provider: app_user_provider
+            form_login:
+                login_path: app_login
+                check_path: app_login
+                enable_csrf: true
             custom_authenticators:
                 - App\Security\GoogleAuthenticator  # For web OAuth
                 # Not: App\Security\SecurityAuthenticator (that's for email login)

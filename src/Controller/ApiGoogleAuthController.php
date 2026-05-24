@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Service\CustomerResolver;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,7 +26,9 @@ class ApiGoogleAuthController extends AbstractController
     public function googleAuth(
         Request $request,
         EntityManagerInterface $entityManager,
-        JWTTokenManagerInterface $jwtManager
+        JWTTokenManagerInterface $jwtManager,
+        CustomerResolver $customerResolver,
+        UserPasswordHasherInterface $passwordHasher
     ): JsonResponse {
         // Log the request
         $this->logger->info('Google auth API called');
@@ -74,12 +78,17 @@ class ApiGoogleAuthController extends AbstractController
                 $user->setEmail($email);
                 
                 // Split name into first and last
-                $nameParts = explode(' ', $name ?? 'Google User', 2);
+                $nameParts = explode(' ', trim($name ?? 'Google User'), 2);
                 $user->setFirstName($nameParts[0]);
-                $user->setLastName($nameParts[1] ?? '');
-                $user->setRoles(['ROLE_USER', 'ROLE_STAFF']);
+                $lastName = $nameParts[1] ?? '';
+                if (strlen($lastName) < 2) {
+                    $lastName = 'User';
+                }
+                $user->setLastName($lastName);
+                $user->setRoles(['ROLE_USER']);
                 $user->setIsVerified(true);
-                
+                $user->setPassword($passwordHasher->hashPassword($user, bin2hex(random_bytes(16))));
+
                 $entityManager->persist($user);
                 $entityManager->flush();
                 
@@ -97,6 +106,8 @@ class ApiGoogleAuthController extends AbstractController
                 }
             }
             
+            $customer = $customerResolver->resolveForUser($user);
+
             // Generate JWT token for API access
             $jwtToken = $jwtManager->create($user);
             $this->logger->info('JWT token generated for user', ['user_id' => $user->getId()]);
@@ -112,7 +123,8 @@ class ApiGoogleAuthController extends AbstractController
                     'lastName' => $user->getLastName(),
                     'fullName' => $user->getFullName(),
                     'roles' => $user->getRoles(),
-                    'isVerified' => $user->isVerified()
+                    'isVerified' => $user->isVerified(),
+                    'customerId' => $customer->getId(),
                 ]
             ]);
             

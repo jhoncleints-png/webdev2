@@ -2,9 +2,14 @@
 
 namespace App\Controller;
 
+use App\Entity\Customer;
 use App\Entity\Order;
+use App\Entity\OrderItem;
 use App\Entity\Product;
+use App\Entity\User;
 use App\Repository\CategoryRepository;
+use App\Service\CustomerResolver;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\OrderRepository;
 use App\Repository\ProductRepository;
 use App\Repository\ActivityLogRepository;
@@ -43,14 +48,16 @@ class ApiController extends AbstractController
     }
 
     #[Route('/api/me', name: 'api_me', methods: ['GET'])]
-    public function me(): JsonResponse
+    public function me(CustomerResolver $customerResolver): JsonResponse
     {
         try {
             $user = $this->getUser();
             
-            if (!$user) {
+            if (!$user instanceof User) {
                 return $this->createErrorResponse('Not authenticated', 401, 'AUTH_REQUIRED');
             }
+
+            $customer = $customerResolver->resolveForUser($user);
 
             return $this->json([
                 'user' => [
@@ -60,7 +67,12 @@ class ApiController extends AbstractController
                     'firstName' => $user->getFirstName(),
                     'lastName' => $user->getLastName(),
                     'roles' => $user->getRoles(),
-                    'isVerified' => $user->isVerified()
+                    'isVerified' => $user->isVerified(),
+                    'customer' => [
+                        'id' => $customer->getId(),
+                        'email' => $customer->getEmail(),
+                        'fullName' => $customer->getName(),
+                    ],
                 ]
             ]);
         } catch (\Exception $e) {
@@ -100,6 +112,102 @@ class ApiController extends AbstractController
             return $this->createErrorResponse('Database error while fetching products', 500, 'DATABASE_ERROR');
         } catch (\Exception $e) {
             return $this->createErrorResponse('An error occurred while fetching products', 500, 'SERVER_ERROR');
+        }
+    }
+
+    #[Route('/api/orders', name: 'api_orders_create', methods: ['POST'])]
+    public function createOrder(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        CustomerResolver $customerResolver
+    ): JsonResponse {
+        try {
+            $user = $this->getUser();
+            if (!$user instanceof User) {
+                return $this->createErrorResponse('Not authenticated', 401, 'AUTH_REQUIRED');
+            }
+
+            $data = json_decode($request->getContent(), true) ?? [];
+            $items = $data['items'] ?? [];
+
+            if (!is_array($items) || count($items) === 0) {
+                return $this->createErrorResponse('Missing order items', 400, 'INVALID_PAYLOAD');
+            }
+
+            $customerId = $data['customer_id'] ?? $data['customerId'] ?? null;
+            if ($customerId) {
+                $customer = $entityManager->getRepository(Customer::class)->find($customerId);
+                if (!$customer || $customer->getEmail() !== $user->getEmail()) {
+                    return $this->createErrorResponse('Customer not found', 400, 'CUSTOMER_NOT_FOUND');
+                }
+            } else {
+                $customer = $customerResolver->resolveForUser($user);
+            }
+
+            $order = new Order();
+            $order->setCustomer($customer);
+            $order->setCreatedBy($user);
+
+            $stockErrors = [];
+
+            foreach ($items as $item) {
+                $productId = $item['product_id'] ?? $item['productId'] ?? null;
+                $quantity = (int) ($item['quantity'] ?? 0);
+
+                if (!$productId || $quantity <= 0) {
+                    return $this->createErrorResponse('Invalid item payload', 400, 'INVALID_ITEM');
+                }
+
+                $product = $entityManager->getRepository(Product::class)->find($productId);
+                if (!$product) {
+                    return $this->createErrorResponse("Product {$productId} not found", 400, 'PRODUCT_NOT_FOUND');
+                }
+
+                if ($product->getStockQuantity() < $quantity) {
+                    $stockErrors[] = "Not enough stock for {$product->getName()}";
+                    continue;
+                }
+
+                $orderItem = new OrderItem();
+                $orderItem->setProduct($product);
+                $orderItem->setQuantity($quantity);
+                $orderItem->setUnitPrice((string) $product->getPrice());
+                $order->addOrderItem($orderItem);
+
+                $product->setStockQuantity($product->getStockQuantity() - $quantity);
+                $product->setLastStockUpdate(new \DateTime());
+                $entityManager->persist($product);
+            }
+
+            if (!empty($stockErrors)) {
+                return $this->json(['error' => implode('; ', $stockErrors), 'errors' => $stockErrors], 400);
+            }
+
+            $notes = $data['notes'] ?? null;
+            if (is_string($notes) && $notes !== '') {
+                $order->setNotes($notes);
+            }
+
+            $order->setTotalAmount($order->calculateTotal());
+            $entityManager->persist($order);
+            $entityManager->flush();
+
+            return $this->json([
+                'id' => $order->getId(),
+                'orderNumber' => $order->getOrderNumber(),
+                'orderDate' => $order->getOrderDate()->format('Y-m-d H:i:s'),
+                'status' => $order->getStatus(),
+                'totalAmount' => $order->getTotalAmount(),
+                'customer' => [
+                    'id' => $customer->getId(),
+                    'name' => $customer->getName(),
+                    'email' => $customer->getEmail(),
+                ],
+            ], 201);
+        } catch (DBALException $e) {
+            return $this->createErrorResponse('Database error while creating order', 500, 'DATABASE_ERROR');
+        } catch (\Exception $e) {
+            return $this->createErrorResponse('An error occurred while creating order', 500, 'SERVER_ERROR');
         }
     }
 

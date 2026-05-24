@@ -1,0 +1,600 @@
+﻿{
+    "security": {
+        "role_hierarchy": {
+            "ROLE_ADMIN": [
+                "ROLE_STAFF",
+                "ROLE_USER"
+            ],
+            "ROLE_STAFF": [
+                "ROLE_USER"
+            ]
+        },
+        "password_hashers": {
+            "Symfony\\Component\\Security\\Core\\User\\PasswordAuthenticatedUserInterface": {
+                "algorithm": "auto",
+                "migrate_from": [],
+                "hash_algorithm": "sha512",
+                "key_length": 40,
+                "ignore_case": false,
+                "encode_as_base64": true,
+                "iterations": 5000,
+                "cost": null,
+                "memory_cost": null,
+                "time_cost": null
+            }
+        },
+        "providers": {
+            "app_user_provider": {
+                "entity": {
+                    "class": "App\\Entity\\User",
+                    "property": "email",
+                    "manager_name": null
+                }
+            }
+        },
+        "firewalls": {
+            "dev": {
+                "pattern": "^/(_(profiler|wdt)|css|images|js)/",
+                "security": false,
+                "methods": [],
+                "user_checker": "security.user_checker",
+                "stateless": false,
+                "lazy": false,
+                "required_badges": []
+            },
+            "api_login": {
+                "pattern": "^/api/login",
+                "stateless": true,
+                "json_login": {
+                    "check_path": "/api/login",
+                    "username_path": "email",
+                    "password_path": "password",
+                    "success_handler": "App\\Security\\JWTAuthenticationSuccessHandler",
+                    "failure_handler": "lexik_jwt_authentication.handler.authentication_failure",
+                    "remember_me": true,
+                    "use_forward": false,
+                    "login_path": "/login"
+                },
+                "methods": [],
+                "security": true,
+                "user_checker": "security.user_checker",
+                "lazy": false,
+                "required_badges": []
+            },
+            "api_register": {
+                "pattern": "^/api/register",
+                "stateless": true,
+                "security": false,
+                "methods": [],
+                "user_checker": "security.user_checker",
+                "lazy": false,
+                "required_badges": []
+            },
+            "api": {
+                "pattern": "^/api",
+                "stateless": true,
+                "jwt": {
+                    "provider": null,
+                    "authenticator": "lexik_jwt_authentication.security.jwt_authenticator"
+                },
+                "methods": [],
+                "security": true,
+                "user_checker": "security.user_checker",
+                "lazy": false,
+                "required_badges": []
+            },
+            "main": {
+                "pattern": "^/",
+                "lazy": false,
+                "provider": "app_user_provider",
+                "form_login": {
+                    "login_path": "app_login",
+                    "check_path": "app_login",
+                    "enable_csrf": true,
+                    "username_parameter": "email",
+                    "password_parameter": "password",
+                    "remember_me": true,
+                    "use_forward": false,
+                    "csrf_parameter": "_csrf_token",
+                    "csrf_token_id": "authenticate",
+                    "post_only": true,
+                    "form_only": false,
+                    "always_use_default_target_path": false,
+                    "default_target_path": "/",
+                    "target_path_parameter": "_target_path",
+                    "use_referer": false,
+                    "failure_path": null,
+                    "failure_forward": false,
+                    "failure_path_parameter": "_failure_path"
+                },
+                "custom_authenticators": [
+                    "App\\Security\\GoogleAuthenticator"
+                ],
+                "logout": {
+                    "path": "app_logout",
+                    "target": "app_landing",
+                    "enable_csrf": null,
+                    "csrf_token_id": "logout",
+                    "csrf_parameter": "_csrf_token",
+                    "invalidate_session": true,
+                    "clear_site_data": [],
+                    "delete_cookies": []
+                },
+                "methods": [],
+                "security": true,
+                "user_checker": "security.user_checker",
+                "stateless": false,
+                "required_badges": []
+            }
+        },
+        "access_control": [
+            {
+                "path": "^/api/login",
+                "roles": [
+                    "PUBLIC_ACCESS"
+                ],
+                "request_matcher": null,
+                "requires_channel": null,
+                "host": null,
+                "port": null,
+                "ips": [],
+                "attributes": [],
+                "route": null,
+                "methods": [],
+                "allow_if": null
+            },
+            {
+                "path": "^/api/register",
+                "roles": [
+                    "PUBLIC_ACCESS"
+                ],
+                "request_matcher": null,
+                "requires_channel": null,
+                "host": null,
+                "port": null,
+                "ips": [],
+                "attributes": [],
+                "route": null,
+                "methods": [],
+                "allow_if": null
+            },
+            {
+                "path": "^/api/verify-email",
+                "roles": [
+                    "PUBLIC_ACCESS"
+                ],
+                "request_matcher": null,
+                "requires_channel": null,
+                "host": null,
+                "port": null,
+                "ips": [],
+                "attributes": [],
+                "route": null,
+                "methods": [],
+                "allow_if": null
+            },
+            {
+                "path": "^/api/resend-verification",
+                "roles": [
+                    "PUBLIC_ACCESS"
+                ],
+                "request_matcher": null,
+                "requires_channel": null,
+                "host": null,
+                "port": null,
+                "ips": [],
+                "attributes": [],
+                "route": null,
+                "methods": [],
+                "allow_if": null
+            },
+            {
+                "path": "^/api/google-auth",
+                "roles": [
+                    "PUBLIC_ACCESS"
+                ],
+                "request_matcher": null,
+                "requires_channel": null,
+                "host": null,
+                "port": null,
+                "ips": [],
+                "attributes": [],
+                "route": null,
+                "methods": [],
+                "allow_if": null
+            },
+            {
+                "path": "^/api/auth/google",
+                "roles": [
+                    "PUBLIC_ACCESS"
+                ],
+                "request_matcher": null,
+                "requires_channel": null,
+                "host": null,
+                "port": null,
+                "ips": [],
+                "attributes": [],
+                "route": null,
+                "methods": [],
+                "allow_if": null
+            },
+            {
+                "path": "^/api/products",
+                "roles": [
+                    "PUBLIC_ACCESS"
+                ],
+                "request_matcher": null,
+                "requires_channel": null,
+                "host": null,
+                "port": null,
+                "ips": [],
+                "attributes": [],
+                "route": null,
+                "methods": [],
+                "allow_if": null
+            },
+            {
+                "path": "^/api/categories",
+                "roles": [
+                    "PUBLIC_ACCESS"
+                ],
+                "request_matcher": null,
+                "requires_channel": null,
+                "host": null,
+                "port": null,
+                "ips": [],
+                "attributes": [],
+                "route": null,
+                "methods": [],
+                "allow_if": null
+            },
+            {
+                "path": "^/api/me",
+                "roles": [
+                    "IS_AUTHENTICATED_FULLY"
+                ],
+                "request_matcher": null,
+                "requires_channel": null,
+                "host": null,
+                "port": null,
+                "ips": [],
+                "attributes": [],
+                "route": null,
+                "methods": [],
+                "allow_if": null
+            },
+            {
+                "path": "^/api",
+                "roles": [
+                    "IS_AUTHENTICATED_FULLY"
+                ],
+                "request_matcher": null,
+                "requires_channel": null,
+                "host": null,
+                "port": null,
+                "ips": [],
+                "attributes": [],
+                "route": null,
+                "methods": [],
+                "allow_if": null
+            },
+            {
+                "path": "^/$",
+                "roles": [
+                    "PUBLIC_ACCESS"
+                ],
+                "request_matcher": null,
+                "requires_channel": null,
+                "host": null,
+                "port": null,
+                "ips": [],
+                "attributes": [],
+                "route": null,
+                "methods": [],
+                "allow_if": null
+            },
+            {
+                "path": "^/login$",
+                "roles": [
+                    "PUBLIC_ACCESS"
+                ],
+                "request_matcher": null,
+                "requires_channel": null,
+                "host": null,
+                "port": null,
+                "ips": [],
+                "attributes": [],
+                "route": null,
+                "methods": [],
+                "allow_if": null
+            },
+            {
+                "path": "^/register$",
+                "roles": [
+                    "PUBLIC_ACCESS"
+                ],
+                "request_matcher": null,
+                "requires_channel": null,
+                "host": null,
+                "port": null,
+                "ips": [],
+                "attributes": [],
+                "route": null,
+                "methods": [],
+                "allow_if": null
+            },
+            {
+                "path": "^/verify-email",
+                "roles": [
+                    "PUBLIC_ACCESS"
+                ],
+                "request_matcher": null,
+                "requires_channel": null,
+                "host": null,
+                "port": null,
+                "ips": [],
+                "attributes": [],
+                "route": null,
+                "methods": [],
+                "allow_if": null
+            },
+            {
+                "path": "^/resend-verification",
+                "roles": [
+                    "PUBLIC_ACCESS"
+                ],
+                "request_matcher": null,
+                "requires_channel": null,
+                "host": null,
+                "port": null,
+                "ips": [],
+                "attributes": [],
+                "route": null,
+                "methods": [],
+                "allow_if": null
+            },
+            {
+                "path": "^/connect/google$",
+                "roles": [
+                    "PUBLIC_ACCESS"
+                ],
+                "request_matcher": null,
+                "requires_channel": null,
+                "host": null,
+                "port": null,
+                "ips": [],
+                "attributes": [],
+                "route": null,
+                "methods": [],
+                "allow_if": null
+            },
+            {
+                "path": "^/connect/google/check",
+                "roles": [
+                    "PUBLIC_ACCESS"
+                ],
+                "request_matcher": null,
+                "requires_channel": null,
+                "host": null,
+                "port": null,
+                "ips": [],
+                "attributes": [],
+                "route": null,
+                "methods": [],
+                "allow_if": null
+            },
+            {
+                "path": "^/contact",
+                "roles": [
+                    "PUBLIC_ACCESS"
+                ],
+                "request_matcher": null,
+                "requires_channel": null,
+                "host": null,
+                "port": null,
+                "ips": [],
+                "attributes": [],
+                "route": null,
+                "methods": [],
+                "allow_if": null
+            },
+            {
+                "path": "^/about",
+                "roles": [
+                    "PUBLIC_ACCESS"
+                ],
+                "request_matcher": null,
+                "requires_channel": null,
+                "host": null,
+                "port": null,
+                "ips": [],
+                "attributes": [],
+                "route": null,
+                "methods": [],
+                "allow_if": null
+            },
+            {
+                "path": "^/admin",
+                "roles": [
+                    "ROLE_ADMIN"
+                ],
+                "request_matcher": null,
+                "requires_channel": null,
+                "host": null,
+                "port": null,
+                "ips": [],
+                "attributes": [],
+                "route": null,
+                "methods": [],
+                "allow_if": null
+            },
+            {
+                "path": "^/user",
+                "roles": [
+                    "ROLE_ADMIN"
+                ],
+                "request_matcher": null,
+                "requires_channel": null,
+                "host": null,
+                "port": null,
+                "ips": [],
+                "attributes": [],
+                "route": null,
+                "methods": [],
+                "allow_if": null
+            },
+            {
+                "path": "^/activity-log",
+                "roles": [
+                    "ROLE_ADMIN"
+                ],
+                "request_matcher": null,
+                "requires_channel": null,
+                "host": null,
+                "port": null,
+                "ips": [],
+                "attributes": [],
+                "route": null,
+                "methods": [],
+                "allow_if": null
+            },
+            {
+                "path": "^/category",
+                "roles": [
+                    "ROLE_ADMIN",
+                    "ROLE_STAFF"
+                ],
+                "request_matcher": null,
+                "requires_channel": null,
+                "host": null,
+                "port": null,
+                "ips": [],
+                "attributes": [],
+                "route": null,
+                "methods": [],
+                "allow_if": null
+            },
+            {
+                "path": "^/customer",
+                "roles": [
+                    "ROLE_ADMIN",
+                    "ROLE_STAFF"
+                ],
+                "request_matcher": null,
+                "requires_channel": null,
+                "host": null,
+                "port": null,
+                "ips": [],
+                "attributes": [],
+                "route": null,
+                "methods": [],
+                "allow_if": null
+            },
+            {
+                "path": "^/order",
+                "roles": [
+                    "ROLE_ADMIN",
+                    "ROLE_STAFF"
+                ],
+                "request_matcher": null,
+                "requires_channel": null,
+                "host": null,
+                "port": null,
+                "ips": [],
+                "attributes": [],
+                "route": null,
+                "methods": [],
+                "allow_if": null
+            },
+            {
+                "path": "^/product",
+                "roles": [
+                    "ROLE_ADMIN",
+                    "ROLE_STAFF"
+                ],
+                "request_matcher": null,
+                "requires_channel": null,
+                "host": null,
+                "port": null,
+                "ips": [],
+                "attributes": [],
+                "route": null,
+                "methods": [],
+                "allow_if": null
+            },
+            {
+                "path": "^/stock",
+                "roles": [
+                    "ROLE_ADMIN",
+                    "ROLE_STAFF"
+                ],
+                "request_matcher": null,
+                "requires_channel": null,
+                "host": null,
+                "port": null,
+                "ips": [],
+                "attributes": [],
+                "route": null,
+                "methods": [],
+                "allow_if": null
+            },
+            {
+                "path": "^/dashboard",
+                "roles": [
+                    "ROLE_USER",
+                    "ROLE_STAFF",
+                    "ROLE_ADMIN"
+                ],
+                "request_matcher": null,
+                "requires_channel": null,
+                "host": null,
+                "port": null,
+                "ips": [],
+                "attributes": [],
+                "route": null,
+                "methods": [],
+                "allow_if": null
+            },
+            {
+                "path": "^/profile",
+                "roles": [
+                    "ROLE_USER",
+                    "ROLE_STAFF",
+                    "ROLE_ADMIN"
+                ],
+                "request_matcher": null,
+                "requires_channel": null,
+                "host": null,
+                "port": null,
+                "ips": [],
+                "attributes": [],
+                "route": null,
+                "methods": [],
+                "allow_if": null
+            },
+            {
+                "path": "^/",
+                "roles": [
+                    "ROLE_USER"
+                ],
+                "request_matcher": null,
+                "requires_channel": null,
+                "host": null,
+                "port": null,
+                "ips": [],
+                "attributes": [],
+                "route": null,
+                "methods": [],
+                "allow_if": null
+            }
+        ],
+        "access_denied_url": null,
+        "session_fixation_strategy": "migrate",
+        "expose_security_errors": "none",
+        "erase_credentials": true,
+        "access_decision_manager": {
+            "allow_if_all_abstain": false,
+            "allow_if_equal_granted_denied": true
+        }
+    }
+}

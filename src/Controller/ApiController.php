@@ -109,9 +109,9 @@ class ApiController extends AbstractController
                 'count' => count($data)
             ]);
         } catch (DBALException $e) {
-            return $this->createErrorResponse('Database error while fetching products', 500, 'DATABASE_ERROR');
-        } catch (\Exception $e) {
-            return $this->createErrorResponse('An error occurred while fetching products', 500, 'SERVER_ERROR');
+            return $this->createErrorResponse('Database error while fetching products: ' . $e->getMessage(), 500, 'DATABASE_ERROR');
+        } catch (\Throwable $e) {
+            return $this->createErrorResponse('An error occurred while fetching products: ' . $e->getMessage(), 500, 'SERVER_ERROR');
         }
     }
 
@@ -251,8 +251,8 @@ class ApiController extends AbstractController
     {
         try {
             $user = $this->getUser();
-            
-            if (!$user) {
+
+            if (!$user instanceof User) {
                 return $this->createErrorResponse('Not authenticated', 401, 'AUTH_REQUIRED');
             }
 
@@ -290,9 +290,9 @@ class ApiController extends AbstractController
                 'count' => count($data)
             ]);
         } catch (DBALException $e) {
-            return $this->createErrorResponse('Database error while fetching orders', 500, 'DATABASE_ERROR');
-        } catch (\Exception $e) {
-            return $this->createErrorResponse('An error occurred while fetching orders', 500, 'SERVER_ERROR');
+            return $this->createErrorResponse('Database error while fetching orders: ' . $e->getMessage(), 500, 'DATABASE_ERROR');
+        } catch (\Throwable $e) {
+            return $this->createErrorResponse('An error occurred while fetching orders: ' . $e->getMessage(), 500, 'SERVER_ERROR');
         }
     }
 

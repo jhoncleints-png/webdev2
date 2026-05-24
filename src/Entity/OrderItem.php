@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\OrderItemRepository;
+use App\Util\DecimalMath;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -91,7 +92,7 @@ class OrderItem
     // ADD THIS METHOD:
     public function getItemTotal(): string
     {
-        return \bcmul($this->unitPrice, (string) $this->quantity, 2);
+        return DecimalMath::mul($this->unitPrice, (string) $this->quantity, 2);
     }
 
     // Also add a __toString method:

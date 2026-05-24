@@ -8,6 +8,7 @@ use App\Entity\Product;
 use App\Form\OrderType;
 use App\Repository\OrderRepository;
 use App\Service\ActivityLogger;
+use App\Util\DecimalMath;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -128,8 +129,8 @@ final class OrderController extends AbstractController
                     $item->setUnitPrice((string)$item->getProduct()->getPrice());
                 }
 
-                $itemTotal = \bcmul($item->getUnitPrice(), (string) $item->getQuantity(), 2);
-                $total = \bcadd($total, $itemTotal, 2);
+                $itemTotal = DecimalMath::mul($item->getUnitPrice(), (string) $item->getQuantity(), 2);
+                $total = DecimalMath::add($total, $itemTotal, 2);
             }
 
             $order->setTotalAmount($total);

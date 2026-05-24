@@ -212,8 +212,8 @@ class Order
     {
         $total = '0.00';
         foreach ($this->orderItems as $orderItem) {
-            $itemTotal = bcmul($orderItem->getUnitPrice(), (string)$orderItem->getQuantity(), 2);
-            $total = bcadd($total, $itemTotal, 2);
+            $itemTotal = \bcmul($orderItem->getUnitPrice(), (string) $orderItem->getQuantity(), 2);
+            $total = \bcadd($total, $itemTotal, 2);
         }
         return $total;
     }

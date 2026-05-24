@@ -128,8 +128,8 @@ final class OrderController extends AbstractController
                     $item->setUnitPrice((string)$item->getProduct()->getPrice());
                 }
 
-                $itemTotal = bcmul($item->getUnitPrice(), (string)$item->getQuantity(), 2);
-                $total = bcadd($total, $itemTotal, 2);
+                $itemTotal = \bcmul($item->getUnitPrice(), (string) $item->getQuantity(), 2);
+                $total = \bcadd($total, $itemTotal, 2);
             }
 
             $order->setTotalAmount($total);

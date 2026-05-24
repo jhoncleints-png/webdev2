@@ -91,7 +91,7 @@ class OrderItem
     // ADD THIS METHOD:
     public function getItemTotal(): string
     {
-        return bcmul($this->unitPrice, (string)$this->quantity, 2);
+        return \bcmul($this->unitPrice, (string) $this->quantity, 2);
     }
 
     // Also add a __toString method:

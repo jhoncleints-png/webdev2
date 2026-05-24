@@ -149,6 +149,7 @@ class ApiController extends AbstractController
             $order->setCreatedBy($user);
 
             $stockErrors = [];
+            $lineItems = [];
 
             foreach ($items as $item) {
                 $productId = $item['product_id'] ?? $item['productId'] ?? null;
@@ -171,16 +172,21 @@ class ApiController extends AbstractController
                 $orderItem = new OrderItem();
                 $orderItem->setProduct($product);
                 $orderItem->setQuantity($quantity);
-                $orderItem->setUnitPrice((string) $product->getPrice());
-                $order->addOrderItem($orderItem);
+                $orderItem->setUnitPrice(number_format((float) $product->getPrice(), 2, '.', ''));
 
-                $product->setStockQuantity($product->getStockQuantity() - $quantity);
-                $product->setLastStockUpdate(new \DateTime());
-                $entityManager->persist($product);
+                $lineItems[] = [
+                    'product' => $product,
+                    'orderItem' => $orderItem,
+                    'quantity' => $quantity,
+                ];
             }
 
             if (!empty($stockErrors)) {
                 return $this->json(['error' => implode('; ', $stockErrors), 'errors' => $stockErrors], 400);
+            }
+
+            if (count($lineItems) === 0) {
+                return $this->createErrorResponse('No valid order items', 400, 'INVALID_PAYLOAD');
             }
 
             $notes = $data['notes'] ?? null;
@@ -188,9 +194,38 @@ class ApiController extends AbstractController
                 $order->setNotes($notes);
             }
 
-            $order->setTotalAmount($order->calculateTotal());
-            $entityManager->persist($order);
-            $entityManager->flush();
+            $entityManager->beginTransaction();
+
+            try {
+                foreach ($lineItems as $line) {
+                    $order->addOrderItem($line['orderItem']);
+
+                    $updatedRows = $entityManager->createQuery(
+                        'UPDATE App\Entity\Product p
+                         SET p.stockQuantity = p.stockQuantity - :quantity,
+                             p.lastStockUpdate = :lastStockUpdate
+                         WHERE p.id = :id AND p.stockQuantity >= :quantity'
+                    )
+                        ->setParameter('quantity', $line['quantity'])
+                        ->setParameter('lastStockUpdate', new \DateTime())
+                        ->setParameter('id', $line['product']->getId())
+                        ->execute();
+
+                    if ($updatedRows !== 1) {
+                        throw new \RuntimeException('Not enough stock for ' . $line['product']->getName());
+                    }
+
+                    $entityManager->refresh($line['product']);
+                }
+
+                $order->setTotalAmount($order->calculateTotal());
+                $entityManager->persist($order);
+                $entityManager->flush();
+                $entityManager->commit();
+            } catch (\Throwable $transactionError) {
+                $entityManager->rollback();
+                throw $transactionError;
+            }
 
             return $this->json([
                 'id' => $order->getId(),
@@ -205,9 +240,9 @@ class ApiController extends AbstractController
                 ],
             ], 201);
         } catch (DBALException $e) {
-            return $this->createErrorResponse('Database error while creating order', 500, 'DATABASE_ERROR');
-        } catch (\Exception $e) {
-            return $this->createErrorResponse('An error occurred while creating order', 500, 'SERVER_ERROR');
+            return $this->createErrorResponse('Database error while creating order: ' . $e->getMessage(), 500, 'DATABASE_ERROR');
+        } catch (\Throwable $e) {
+            return $this->createErrorResponse('An error occurred while creating order: ' . $e->getMessage(), 500, 'SERVER_ERROR');
         }
     }
 
@@ -441,7 +476,7 @@ class ApiController extends AbstractController
             if ($sinceDate) {
                 $orders = $orderRepository->createQueryBuilder('o')
                     ->where('o.createdBy = :user')
-                    ->andWhere('o.updatedAt > :since OR o.createdAt > :since')
+                    ->andWhere('o.orderDate > :since')
                     ->setParameter('user', $user)
                     ->setParameter('since', $sinceDate)
                     ->orderBy('o.orderDate', 'DESC')
@@ -471,7 +506,6 @@ class ApiController extends AbstractController
                     'status' => $order->getStatus(),
                     'statusLabel' => $order->getStatusLabel(),
                     'totalAmount' => $order->getTotalAmount(),
-                    'updatedAt' => $order->getUpdatedAt()?->format('Y-m-d H:i:s'),
                     'customer' => [
                         'id' => $order->getCustomer()->getId(),
                         'name' => $order->getCustomer()->getName(),
@@ -509,7 +543,7 @@ class ApiController extends AbstractController
 
             if ($sinceDate) {
                 $products = $productRepository->createQueryBuilder('p')
-                    ->where('p.updatedAt > :since OR p.createdAt > :since')
+                    ->where('p.createdAt > :since OR p.lastStockUpdate > :since')
                     ->setParameter('since', $sinceDate)
                     ->getQuery()
                     ->getResult();
@@ -530,7 +564,7 @@ class ApiController extends AbstractController
                         'id' => $product->getCategory()->getId(),
                         'name' => $product->getCategory()->getName(),
                     ] : null,
-                    'updatedAt' => $product->getUpdatedAt()?->format('Y-m-d H:i:s'),
+                    'lastStockUpdate' => $product->getLastStockUpdate()?->format('Y-m-d H:i:s'),
                 ];
             }
 

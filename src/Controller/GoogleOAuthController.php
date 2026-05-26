@@ -20,7 +20,7 @@ class GoogleOAuthController extends AbstractController
         // Debug: Log the redirect URI being used
         $redirectUri = $this->generateUrl('connect_google_check', [], UrlGeneratorInterface::ABSOLUTE_URL);
         error_log('Google OAuth Redirect URI: ' . $redirectUri);
-        error_log('Google OAuth Client ID: ' . $_ENV['GOOGLE_CLIENT_ID'] ?? 'not set');
+        error_log('Google OAuth Client ID: ' . ($_ENV['OAUTH_GOOGLE_CLIENT_ID'] ?? 'not set'));
         
         return $client->redirect([
             'openid', 'email', 'profile'

@@ -9,6 +9,7 @@ use App\Entity\Product;
 use App\Entity\User;
 use App\Repository\CategoryRepository;
 use App\Service\CustomerResolver;
+use App\Service\NotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\OrderRepository;
 use App\Repository\ProductRepository;
@@ -24,6 +25,10 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ApiController extends AbstractController
 {
+    public function __construct(
+        private NotificationService $notificationService
+    ) {}
+
     private function createErrorResponse(string $message, int $code, ?string $errorCode = null): JsonResponse
     {
         $response = [
@@ -222,6 +227,16 @@ class ApiController extends AbstractController
                 $entityManager->persist($order);
                 $entityManager->flush();
                 $entityManager->commit();
+
+                // Create notification for new order
+                $this->notificationService->notifyNewOrder($order);
+
+                // Check for low stock after order
+                foreach ($lineItems as $line) {
+                    if ($line['product']->getStockQuantity() <= 10) {
+                        $this->notificationService->notifyLowStock($line['product']);
+                    }
+                }
             } catch (\Throwable $transactionError) {
                 $entityManager->rollback();
                 throw $transactionError;

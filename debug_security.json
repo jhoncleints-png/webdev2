@@ -189,7 +189,7 @@
                 "allow_if": null
             },
             {
-                "path": "^/api/google-auth",
+                "path": "^/api/auth/google",
                 "roles": [
                     "PUBLIC_ACCESS"
                 ],

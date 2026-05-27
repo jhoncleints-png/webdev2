@@ -84,4 +84,48 @@ class EmailVerificationController extends AbstractController
         
         return $this->redirectToRoute('app_login');
     }
+
+    #[Route('/api/resend-verification', name: 'api_resend_verification', methods: ['POST'])]
+    public function apiResendVerification(
+        Request $request,
+        EmailVerificationService $emailVerificationService,
+        EntityManagerInterface $entityManager
+    ): Response {
+        $data = json_decode($request->getContent(), true);
+        $email = $data['email'] ?? null;
+
+        if (!$email) {
+            return $this->json(['success' => false, 'error' => 'Email address is required.'], 400);
+        }
+
+        $user = $entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
+
+        if (!$user) {
+            return $this->json(['success' => false, 'error' => 'User not found.'], 404);
+        }
+
+        if ($user->isVerified()) {
+            return $this->json(['success' => false, 'error' => 'This email is already verified.'], 400);
+        }
+
+        // Generate new token
+        $newToken = $emailVerificationService->generateVerificationToken();
+        $user->setVerificationToken($newToken);
+        $entityManager->flush();
+
+        // Generate verification URL
+        $verificationUrl = $this->generateUrl(
+            'app_verify_email',
+            ['token' => $newToken],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+
+        // Send verification email
+        try {
+            $emailVerificationService->sendVerificationEmail($user, $verificationUrl);
+            return $this->json(['success' => true, 'message' => 'Verification email has been resent.']);
+        } catch (\Exception $e) {
+            return $this->json(['success' => false, 'error' => 'Failed to send verification email.'], 500);
+        }
+    }
 }

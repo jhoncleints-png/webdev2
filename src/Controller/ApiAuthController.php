@@ -13,7 +13,7 @@ use Symfony\Component\HttpClient\HttpClient;
 
 class ApiAuthController extends AbstractController
 {
-    #[Route('/api/google-auth', name: 'api_google_auth', methods: ['POST'])]
+    #[Route('/api/auth/google', name: 'api_google_auth', methods: ['POST'])]
     public function googleLogin(
         Request $request,
         EntityManagerInterface $em,

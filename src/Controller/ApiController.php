@@ -199,47 +199,45 @@ class ApiController extends AbstractController
                 $order->setNotes($notes);
             }
 
-            $entityManager->beginTransaction();
-
+            // FIXED: Use Doctrine's transactional method instead of manual beginTransaction/commit
             try {
-                foreach ($lineItems as $line) {
-                    $order->addOrderItem($line['orderItem']);
+                $entityManager->wrapInTransaction(function() use ($entityManager, $lineItems, $order) {
+                    foreach ($lineItems as $line) {
+                        $order->addOrderItem($line['orderItem']);
 
-                    $updatedRows = $entityManager->createQuery(
-                        'UPDATE App\Entity\Product p
-                         SET p.stockQuantity = p.stockQuantity - :quantity,
-                             p.lastStockUpdate = :lastStockUpdate
-                         WHERE p.id = :id AND p.stockQuantity >= :quantity'
-                    )
-                        ->setParameter('quantity', $line['quantity'])
-                        ->setParameter('lastStockUpdate', new \DateTime())
-                        ->setParameter('id', $line['product']->getId())
-                        ->execute();
+                        $updatedRows = $entityManager->createQuery(
+                            'UPDATE App\Entity\Product p
+                            SET p.stockQuantity = p.stockQuantity - :quantity,
+                                p.lastStockUpdate = :lastStockUpdate
+                            WHERE p.id = :id AND p.stockQuantity >= :quantity'
+                        )
+                            ->setParameter('quantity', $line['quantity'])
+                            ->setParameter('lastStockUpdate', new \DateTime())
+                            ->setParameter('id', $line['product']->getId())
+                            ->execute();
 
-                    if ($updatedRows !== 1) {
-                        throw new \RuntimeException('Not enough stock for ' . $line['product']->getName());
+                        if ($updatedRows !== 1) {
+                            throw new \RuntimeException('Not enough stock for ' . $line['product']->getName());
+                        }
+
+                        $entityManager->refresh($line['product']);
                     }
 
-                    $entityManager->refresh($line['product']);
-                }
-
-                $order->setTotalAmount($order->calculateTotal());
-                $entityManager->persist($order);
-                $entityManager->flush();
-                $entityManager->commit();
-
-                // Create notification for new order
-                $this->notificationService->notifyNewOrder($order);
-
-                // Check for low stock after order
-                foreach ($lineItems as $line) {
-                    if ($line['product']->getStockQuantity() <= 10) {
-                        $this->notificationService->notifyLowStock($line['product']);
-                    }
-                }
+                    $order->setTotalAmount($order->calculateTotal());
+                    $entityManager->persist($order);
+                });
             } catch (\Throwable $transactionError) {
-                $entityManager->rollback();
                 throw $transactionError;
+            }
+
+            // Create notification for new order (outside transaction)
+            $this->notificationService->notifyNewOrder($order);
+
+            // Check for low stock after order
+            foreach ($lineItems as $line) {
+                if ($line['product']->getStockQuantity() <= 10) {
+                    $this->notificationService->notifyLowStock($line['product']);
+                }
             }
 
             return $this->json([

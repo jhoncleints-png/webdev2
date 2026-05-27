@@ -28,17 +28,22 @@ class EmailVerificationService
      */
     public function sendVerificationEmail(User $user, string $verificationUrl): void
     {
-        $email = (new TemplatedEmail())
-            ->from(new Address('jhoncleints@gmail.com', 'Samaco Brewery'))
-            ->to(new Address($user->getEmail()))
-            ->subject('Please verify your email address')
-            ->htmlTemplate('emails/verification.html.twig')
-            ->context([
-                'user' => $user,
-                'verificationUrl' => $verificationUrl,
-            ]);
+        try {
+            $email = (new TemplatedEmail())
+                ->from(new Address('jhoncleints@gmail.com', 'Samaco Brewery'))
+                ->to(new Address($user->getEmail()))
+                ->subject('Please verify your email address')
+                ->htmlTemplate('emails/verification.html.twig')
+                ->context([
+                    'user' => $user,
+                    'verificationUrl' => $verificationUrl,
+                ]);
 
-        $this->mailer->send($email);
+            $this->mailer->send($email);
+        } catch (\Exception $e) {
+            error_log('Email verification failed: ' . $e->getMessage());
+            throw $e;
+        }
     }
 
     /**

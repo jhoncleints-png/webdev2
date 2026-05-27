@@ -13,6 +13,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mercure\HubInterface;
+use Symfony\Component\Mercure\Update;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -21,7 +23,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class OrderController extends AbstractController
 {
     public function __construct(
-        private ActivityLogger $activityLogger
+        private ActivityLogger $activityLogger,
+        private HubInterface $mercureHub
     ) {}
 
     /**
@@ -139,6 +142,28 @@ final class OrderController extends AbstractController
             $entityManager->persist($order);
             $entityManager->flush();
 
+            // Publish to Mercure for real-time notifications
+            $update = new Update(
+                'orders/new',
+                json_encode([
+                    'id' => $order->getId(),
+                    'orderNumber' => $order->getOrderNumber(),
+                    'customer' => $order->getCustomer()->getEmail(),
+                    'customerName' => $order->getCustomer()->getName(),
+                    'total' => $order->getTotalAmount(),
+                    'status' => $order->getStatus(),
+                    'items' => array_map(function($item) {
+                        return [
+                            'productName' => $item->getProduct()->getName(),
+                            'quantity' => $item->getQuantity(),
+                            'price' => $item->getUnitPrice()
+                        ];
+                    }, $order->getOrderItems()->toArray()),
+                    'createdAt' => $order->getCreatedAt()->format('Y-m-d H:i:s')
+                ])
+            );
+            $this->mercureHub->publish($update);
+
             // LOG ORDER CREATION
             $this->activityLogger->log(
                 $this->getUser(),
@@ -221,6 +246,19 @@ final class OrderController extends AbstractController
             }
 
             $entityManager->flush();
+
+            // Publish status update to Mercure
+            $update = new Update(
+                'orders/update',
+                json_encode([
+                    'id' => $order->getId(),
+                    'orderNumber' => $order->getOrderNumber(),
+                    'status' => $order->getStatus(),
+                    'customerName' => $order->getCustomer()->getName(),
+                    'updatedAt' => $order->getUpdatedAt()->format('Y-m-d H:i:s')
+                ])
+            );
+            $this->mercureHub->publish($update);
 
             // LOG ORDER UPDATE
             $newStatus = $order->getStatus();

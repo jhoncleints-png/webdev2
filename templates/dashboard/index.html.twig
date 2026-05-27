@@ -3,7 +3,7 @@
 {% block title %}Dashboard - Samaco Brewery{% endblock %}
 
 {% block dashboard_content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6" data-user-id="{% if app.user %}{{ app.user.id }}{% endif %}">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6" data-user-id="{% if app.user %}{{ app.user.id }}{% endif %}" data-mercure-url="{{ mercure_url('orders/new') }}">
     
     <!-- Real-time Notification Banner -->
     <div id="notification-banner" class="hidden fixed top-4 right-4 z-50 max-w-sm">
@@ -398,29 +398,43 @@
 
         // Mercure WebSocket Connection for Real-time Notifications
         (function() {
-            const dashboard = document.querySelector('[data-user-id]');
+            const dashboard = document.querySelector('[data-mercure-url]');
             if (!dashboard) return;
             
-            const userId = dashboard.getAttribute('data-user-id');
-            if (!userId) return;
+            const mercureUrl = dashboard.getAttribute('data-mercure-url');
+            const updateTopic = encodeURIComponent('orders/update');
+            const fullUrl = mercureUrl + '&topic=' + updateTopic;
             
-            const mercureUrl = 'http://127.0.0.1:3000/.well-known/mercure';
-            const eventSource = new EventSource(mercureUrl + '?topic=/orders/' + userId + '&topic=/activity/' + userId);
+            try {
+                const eventSource = new EventSource(fullUrl);
 
-            eventSource.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                
-                if (data.type === 'orders_sync') {
-                    showNotification('New Order', 'A new order has been placed!');
-                } else if (data.type === 'activity_sync') {
-                    showNotification('Activity Update', 'New activity detected in the system.');
-                }
-            };
+                eventSource.onmessage = (event) => {
+                    const order = JSON.parse(event.data);
+                    
+                    if (order.updatedAt) {
+                        showNotification('Order Updated', `Order #${order.id} status changed to ${order.status}`);
+                    } else {
+                        showNotification('New Order', `Order #${order.orderNumber} from ${order.customerName} - ₱${order.total}`);
+                    }
+                    
+                    // Play notification sound
+                    try {
+                        const audio = new Audio('/sounds/notification.mp3');
+                        audio.play().catch(e => console.log('Audio play failed:', e));
+                    } catch (e) {
+                        console.log('Audio not available:', e);
+                    }
+                };
 
-            eventSource.onerror = (error) => {
-                console.error('Mercure connection error:', error);
-                eventSource.close();
-            };
+                eventSource.onerror = (error) => {
+                    console.error('Mercure connection error:', error);
+                    // Don't close on error, let it retry
+                };
+
+                console.log('[MERCURE] Connected to:', fullUrl);
+            } catch (error) {
+                console.error('[MERCURE] Failed to connect:', error);
+            }
         })();
     </script>
 {% endblock %}

@@ -139,7 +139,7 @@ class GoogleAuthenticator extends OAuth2Authenticator
         }
         
         // Web request - redirect to dashboard
-        return new RedirectResponse($this->router->generate('dashboard'));
+        return new RedirectResponse($this->router->generate('app_dashboard_home'));
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response

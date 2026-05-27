@@ -117,9 +117,10 @@ class RegistrationController extends AbstractController
         
         
         // Generate verification token and set as not verified
+        // DISABLED FOR TESTING: Auto-verify users
         $verificationToken = $emailVerificationService->generateVerificationToken();
         $user->setVerificationToken($verificationToken);
-        $user->setIsVerified(false);
+        $user->setIsVerified(true);
         
         
         // Hash password

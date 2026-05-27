@@ -159,7 +159,7 @@ final class OrderController extends AbstractController
                             'price' => $item->getUnitPrice()
                         ];
                     }, $order->getOrderItems()->toArray()),
-                    'createdAt' => $order->getCreatedAt()->format('Y-m-d H:i:s')
+                    'createdAt' => $order->getOrderDate()->format('Y-m-d H:i:s')
                 ])
             );
             $this->mercureHub->publish($update);
@@ -255,7 +255,7 @@ final class OrderController extends AbstractController
                     'orderNumber' => $order->getOrderNumber(),
                     'status' => $order->getStatus(),
                     'customerName' => $order->getCustomer()->getName(),
-                    'updatedAt' => $order->getUpdatedAt()->format('Y-m-d H:i:s')
+                    'updatedAt' => $order->getOrderDate()->format('Y-m-d H:i:s')
                 ])
             );
             $this->mercureHub->publish($update);

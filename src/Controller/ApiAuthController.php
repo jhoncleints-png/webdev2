@@ -23,7 +23,10 @@ class ApiAuthController extends AbstractController
         $idToken = $data['idToken'] ?? null;
 
         if (!$idToken) {
-            return $this->json(['error' => 'No token provided'], 400);
+            return $this->json([
+                'success' => false,
+                'error' => 'No token provided'
+            ], 400);
         }
 
         // Verify Google ID token using Google's tokeninfo endpoint
@@ -34,7 +37,10 @@ class ApiAuthController extends AbstractController
             ]);
 
             if ($response->getStatusCode() !== 200) {
-                return $this->json(['error' => 'Invalid token'], 401);
+                return $this->json([
+                    'success' => false,
+                    'error' => 'Invalid token'
+                ], 401);
             }
 
             $payload = $response->toArray();
@@ -42,7 +48,10 @@ class ApiAuthController extends AbstractController
             // Verify the token is for your app
             $googleClientId = $_ENV['GOOGLE_CLIENT_ID'] ?? null;
             if ($googleClientId && ($payload['aud'] !== $googleClientId)) {
-                return $this->json(['error' => 'Token audience mismatch'], 401);
+                return $this->json([
+                    'success' => false,
+                    'error' => 'Token audience mismatch'
+                ], 401);
             }
 
             $email = $payload['email'];
@@ -83,6 +92,7 @@ class ApiAuthController extends AbstractController
             $jwt = $jwtManager->create($user);
 
             return $this->json([
+                'success' => true,
                 'token' => $jwt,
                 'user' => [
                     'id' => $user->getId(),
@@ -95,7 +105,10 @@ class ApiAuthController extends AbstractController
                 ]
             ]);
         } catch (\Exception $e) {
-            return $this->json(['error' => 'Token verification failed: ' . $e->getMessage()], 401);
+            return $this->json([
+                'success' => false,
+                'error' => 'Token verification failed: ' . $e->getMessage()
+            ], 401);
         }
     }
 }

@@ -43,7 +43,7 @@ class NotificationService
      */
     public function notifyNewOrder(Order $order): void
     {
-        $customerName = $order->getCustomer()->getFullName() ?? $order->getCustomer()->getEmail();
+        $customerName = $order->getCustomer()->getName() ?? $order->getCustomer()->getEmail();
         $totalAmount = number_format($order->getTotalAmount(), 2);
         
         $this->create(
@@ -63,7 +63,7 @@ class NotificationService
         $this->create(
             Notification::TYPE_LOW_STOCK,
             'Low Stock Alert',
-            "Product '{$product->getName()}' is running low on stock ({$product->getStock()} units remaining)",
+            "Product '{$product->getName()}' is running low on stock ({$product->getStockQuantity()} units remaining)",
             'Product',
             $product->getId()
         );
@@ -74,7 +74,8 @@ class NotificationService
      */
     public function notifyOrderCancelled(Order $order): void
     {
-        $customerName = $order->getCustomer()->getFullName() ?? $order->getCustomer()->getEmail();
+        
+        $customerName = $order->getCustomer()->getName() ?? $order->getCustomer()->getEmail();
         
         $this->create(
             Notification::TYPE_ORDER_CANCELLED,
@@ -90,7 +91,8 @@ class NotificationService
      */
     public function notifyOrderCompleted(Order $order): void
     {
-        $customerName = $order->getCustomer()->getFullName() ?? $order->getCustomer()->getEmail();
+        
+        $customerName = $order->getCustomer()->getName() ?? $order->getCustomer()->getEmail();
         
         $this->create(
             Notification::TYPE_ORDER_COMPLETED,
@@ -108,8 +110,8 @@ class NotificationService
     {
         $productRepository = $this->entityManager->getRepository(Product::class);
         $lowStockProducts = $productRepository->createQueryBuilder('p')
-            ->where('p.stock <= :threshold')
-            ->andWhere('p.stock > 0')
+            ->where('p.stockQuantity <= :threshold')
+            ->andWhere('p.stockQuantity > 0')
             ->setParameter('threshold', $threshold)
             ->getQuery()
             ->getResult();

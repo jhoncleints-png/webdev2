@@ -47,6 +47,7 @@ security:
                 enable_csrf: true
                 username_parameter: email
                 password_parameter: password
+                default_target_path: app_dashboard_home
             custom_authenticators:
                 - App\Security\GoogleAuthenticator  # For web OAuth
                 # Not: App\Security\SecurityAuthenticator (that's for email login)

@@ -262,37 +262,38 @@
             }
         });
 
-        setInterval(async () => {
-            try {
-                console.log('[BACKEND POLLING] Checking for new orders...');
-                const response = await fetch('/api/orders/count');
-                const data = await response.json();
-                const orderNumbers = data.orderNumbers || [];
-                console.log('[BACKEND POLLING] Current order IDs:', Array.from(currentOrderIds));
-                console.log('[BACKEND POLLING] API returned order numbers:', orderNumbers);
+        // DISABLED FOR FCM TESTING
+        // setInterval(async () => {
+        //     try {
+        //         console.log('[BACKEND POLLING] Checking for new orders...');
+        //         const response = await fetch('/api/orders/count');
+        //         const data = await response.json();
+        //         const orderNumbers = data.orderNumbers || [];
+        //         console.log('[BACKEND POLLING] Current order IDs:', Array.from(currentOrderIds));
+        //         console.log('[BACKEND POLLING] API returned order numbers:', orderNumbers);
 
-                const newOrderIds = new Set(orderNumbers);
-                let hasNewOrder = false;
+        //         const newOrderIds = new Set(orderNumbers);
+        //         let hasNewOrder = false;
 
-                orderNumbers.forEach(orderNumber => {
-                    if (!currentOrderIds.has(orderNumber)) {
-                        hasNewOrder = true;
-                        console.log('[BACKEND POLLING] New order detected:', orderNumber);
-                    }
-                });
+        //         orderNumbers.forEach(orderNumber => {
+        //             if (!currentOrderIds.has(orderNumber)) {
+        //                 hasNewOrder = true;
+        //                 console.log('[BACKEND POLLING] New order detected:', orderNumber);
+        //             }
+        //         });
 
-                if (hasNewOrder) {
-                    console.log('[BACKEND POLLING] New order detected! Refreshing...');
-                    showNotification('📦 New order received!', 'success');
-                    currentOrderIds = newOrderIds;
-                    setTimeout(() => location.reload(), 2000);
-                } else {
-                    console.log('[BACKEND POLLING] No new orders');
-                }
-            } catch (error) {
-                console.error('[BACKEND POLLING] Polling error:', error);
-            }
-        }, 5000);
+        //         if (hasNewOrder) {
+        //             console.log('[BACKEND POLLING] New order detected! Refreshing...');
+        //             showNotification('📦 New order received!', 'success');
+        //             currentOrderIds = newOrderIds;
+        //             setTimeout(() => location.reload(), 2000);
+        //         } else {
+        //             console.log('[BACKEND POLLING] No new orders');
+        //         }
+        //     } catch (error) {
+        //         console.error('[BACKEND POLLING] Polling error:', error);
+        //     }
+        // }, 5000);
 
         function showNotification(message, type) {
             const toast = document.createElement('div');

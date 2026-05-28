@@ -12,7 +12,8 @@ class NotificationService
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private NotificationRepository $notificationRepository
+        private NotificationRepository $notificationRepository,
+        private FcmService $fcmService
     ) {}
 
     /**
@@ -182,5 +183,68 @@ class NotificationService
     public function getNotificationById(int $id): ?Notification
     {
         return $this->notificationRepository->find($id);
+    }
+
+    /**
+     * Send FCM notification for order status update
+     */
+    public function sendOrderStatusUpdateNotification(Order $order): void
+    {
+        try {
+            $customer = $order->getCustomer();
+            if (!$customer || !$customer->getFcmToken()) {
+                error_log('[NOTIFICATION SERVICE] No FCM token found for customer: ' . ($customer ? $customer->getName() : 'unknown'));
+                return;
+            }
+
+            error_log('[NOTIFICATION SERVICE] Sending FCM notification for order update to customer: ' . $customer->getName());
+            $result = $this->fcmService->sendOrderStatusNotification(
+                $customer->getFcmToken(),
+                $order->getOrderNumber(),
+                $order->getStatus(),
+                $customer->getName()
+            );
+
+            if ($result) {
+                error_log('[NOTIFICATION SERVICE] FCM notification sent successfully');
+            } else {
+                error_log('[NOTIFICATION SERVICE] FCM notification failed to send');
+            }
+        } catch (\Exception $e) {
+            error_log('[NOTIFICATION SERVICE] Error sending FCM notification: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Send FCM notification for new order
+     */
+    public function sendNewOrderNotification(Order $order): void
+    {
+        try {
+            $customer = $order->getCustomer();
+            if (!$customer || !$customer->getFcmToken()) {
+                error_log('[NOTIFICATION SERVICE] No FCM token found for customer');
+                return;
+            }
+
+            error_log('[NOTIFICATION SERVICE] Sending FCM notification for new order to customer: ' . $customer->getName());
+            $result = $this->fcmService->sendNotification(
+                $customer->getFcmToken(),
+                'New Order Confirmation',
+                "Your order #{$order->getOrderNumber()} has been received. Total: ₱" . number_format($order->getTotalAmount(), 2),
+                [
+                    'type' => 'order_update',
+                    'orderNumber' => $order->getOrderNumber(),
+                    'orderId' => $order->getId(),
+                    'status' => $order->getStatus(),
+                ]
+            );
+
+            if ($result) {
+                error_log('[NOTIFICATION SERVICE] FCM new order notification sent successfully');
+            }
+        } catch (\Exception $e) {
+            error_log('[NOTIFICATION SERVICE] Error sending new order FCM notification: ' . $e->getMessage());
+        }
     }
 }

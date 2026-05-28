@@ -691,4 +691,40 @@ class ApiController extends AbstractController
             return $this->createErrorResponse('An error occurred while syncing activity', 500, 'SERVER_ERROR');
         }
     }
+
+    #[Route('/api/customer/fcm/register', name: 'api_customer_fcm_register', methods: ['POST'])]
+    public function registerCustomerFcmToken(Request $request, CustomerResolver $customerResolver, EntityManagerInterface $entityManager): JsonResponse
+    {
+        try {
+            $user = $this->getUser();
+            
+            if (!$user instanceof User) {
+                return $this->createErrorResponse('Not authenticated', 401, 'AUTH_REQUIRED');
+            }
+
+            $data = json_decode($request->getContent(), true);
+            $fcmToken = $data['token'] ?? null;
+
+            if (!$fcmToken) {
+                return $this->createErrorResponse('FCM token is required', 400, 'INVALID_TOKEN');
+            }
+
+            // Get or create customer for this user
+            $customer = $customerResolver->resolveForUser($user);
+            $customer->setFcmToken($fcmToken);
+            
+            $entityManager->flush();
+
+            error_log('[API FCM] Customer FCM token registered for user: ' . $user->getEmail());
+
+            return $this->json([
+                'success' => true,
+                'message' => 'FCM token registered successfully for customer',
+                'customerId' => $customer->getId()
+            ]);
+        } catch (\Exception $e) {
+            error_log('[API FCM] Error: ' . $e->getMessage());
+            return $this->createErrorResponse('An error occurred while registering FCM token', 500, 'SERVER_ERROR');
+        }
+    }
 }

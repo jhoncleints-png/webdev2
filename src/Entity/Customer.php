@@ -58,6 +58,9 @@ class Customer
     )]
     private ?string $address = null;
 
+    #[ORM\Column(length: 500, nullable: true)]
+    private ?string $fcmToken = null;
+
     /**
      * @var Collection<int, Order>
      */
@@ -166,6 +169,18 @@ class Customer
     public function setCreatedBy(?User $createdBy): static
     {
         $this->createdBy = $createdBy;
+
+        return $this;
+    }
+
+    public function getFcmToken(): ?string
+    {
+        return $this->fcmToken;
+    }
+
+    public function setFcmToken(?string $fcmToken): static
+    {
+        $this->fcmToken = $fcmToken;
 
         return $this;
     }

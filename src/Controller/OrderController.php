@@ -272,7 +272,7 @@ final class OrderController extends AbstractController
     #[Route('/api/orders/count', name: 'api_orders_count', methods: ['GET'])]
     public function getOrderCount(OrderRepository $orderRepository): JsonResponse
     {
-        $orders = $orderRepository->findAll();
+        $orders = $orderRepository->findBy([], ['id' => 'DESC']);
         $orderNumbers = array_map(fn($order) => $order->getOrderNumber(), $orders);
         return new JsonResponse(['orderNumbers' => $orderNumbers]);
     }

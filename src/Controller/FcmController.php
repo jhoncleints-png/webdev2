@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\UserRepository;
 use App\Service\FcmService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,19 +19,28 @@ class FcmController extends AbstractController
     ) {}
 
     #[Route('/api/fcm/register', name: 'api_fcm_register', methods: ['POST'])]
-    public function registerFcmToken(Request $request): JsonResponse
+    public function registerFcmToken(Request $request, UserRepository $userRepository): JsonResponse
     {
         try {
             $data = json_decode($request->getContent(), true);
             $fcmToken = $data['token'] ?? null;
+            $email = $data['email'] ?? null;
 
             if (!$fcmToken) {
                 return $this->json(['error' => 'FCM token is required'], 400);
             }
 
-            $user = $this->getUser();
-            $user->setFcmToken($fcmToken);
+            if (!$email) {
+                return $this->json(['error' => 'Email is required'], 400);
+            }
 
+            $user = $userRepository->findOneBy(['email' => $email]);
+
+            if (!$user) {
+                return $this->json(['error' => 'User not found'], 404);
+            }
+
+            $user->setFcmToken($fcmToken);
             $this->entityManager->flush();
 
             return $this->json([

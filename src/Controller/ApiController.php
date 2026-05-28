@@ -547,6 +547,74 @@ class ApiController extends AbstractController
         }
     }
 
+    #[Route('/api/orders/{id}/cancel', name: 'api_order_cancel', methods: ['PATCH'])]
+    public function cancelOrder(
+        int $id,
+        OrderRepository $orderRepository,
+        EntityManagerInterface $entityManager,
+        HubInterface $hub
+    ): JsonResponse {
+        try {
+            $user = $this->getUser();
+            if (!$user) {
+                return $this->createErrorResponse('Not authenticated', 401, 'AUTH_REQUIRED');
+            }
+
+            $order = $orderRepository->find($id);
+            if (!$order) {
+                return $this->createErrorResponse('Order not found', 404, 'ORDER_NOT_FOUND');
+            }
+
+            // Check if user owns this order
+            if ($order->getCreatedBy()->getId() !== $user->getId()) {
+                return $this->createErrorResponse('You can only cancel your own orders', 403, 'FORBIDDEN');
+            }
+
+            // Prevent cancelling already cancelled or delivered orders
+            if ($order->getStatus() === Order::STATUS_CANCELLED) {
+                return $this->createErrorResponse('Order already cancelled', 400, 'ALREADY_CANCELLED');
+            }
+            if ($order->getStatus() === Order::STATUS_DELIVERED) {
+                return $this->createErrorResponse('Cannot cancel delivered orders', 400, 'CANNOT_CANCEL_DELIVERED');
+            }
+
+            $oldStatus = $order->getStatus();
+            $order->setStatus(Order::STATUS_CANCELLED);
+
+            // Restore stock
+            foreach ($order->getOrderItems() as $item) {
+                $product = $item->getProduct();
+                $product->setStockQuantity($product->getStockQuantity() + $item->getQuantity());
+                $product->setLastStockUpdate(new \DateTime());
+            }
+
+            $entityManager->flush();
+
+            // Publish to Mercure (optional)
+            try {
+                $this->publishUpdate('/orders/update', [
+                    'id' => $order->getId(),
+                    'orderNumber' => $order->getOrderNumber(),
+                    'status' => $order->getStatus(),
+                    'customerName' => $order->getCustomer()->getName(),
+                    'updatedAt' => $order->getOrderDate()->format('Y-m-d H:i:s')
+                ], $hub);
+            } catch (\Exception $e) {
+                // Mercure is optional
+            }
+
+            return $this->json([
+                'id' => $order->getId(),
+                'status' => $order->getStatus(),
+                'message' => 'Order cancelled successfully'
+            ]);
+        } catch (DBALException $e) {
+            return $this->createErrorResponse('Database error while cancelling order', 500, 'DATABASE_ERROR');
+        } catch (\Exception $e) {
+            return $this->createErrorResponse('An error occurred while cancelling order', 500, 'SERVER_ERROR');
+        }
+    }
+
     #[Route('/api/sync/products', name: 'api_sync_products', methods: ['GET'])]
     public function syncProducts(Request $request, ProductRepository $productRepository, HubInterface $hub): JsonResponse
     {

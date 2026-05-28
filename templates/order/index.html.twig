@@ -265,7 +265,7 @@
         setInterval(async () => {
             try {
                 console.log('[BACKEND POLLING] Checking for new orders...');
-                const response = await fetch('/order/api/orders/count');
+                const response = await fetch('/api/orders/count');
                 const data = await response.json();
                 const orderNumbers = data.orderNumbers || [];
                 console.log('[BACKEND POLLING] Current order IDs:', Array.from(currentOrderIds));

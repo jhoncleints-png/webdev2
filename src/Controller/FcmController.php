@@ -18,13 +18,12 @@ class FcmController extends AbstractController
         private EntityManagerInterface $entityManager
     ) {}
 
-    #[Route('/fcm-token', name: 'api_fcm_register', methods: ['POST'])]
-    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    #[Route('/fcm/register', name: 'api_fcm_register', methods: ['POST'])]
     public function registerFcmToken(Request $request): JsonResponse
     {
         try {
             $data = json_decode($request->getContent(), true);
-            $fcmToken = $data['fcmToken'] ?? null;
+            $fcmToken = $data['token'] ?? null;
 
             if (!$fcmToken) {
                 return $this->json(['error' => 'FCM token is required'], 400);

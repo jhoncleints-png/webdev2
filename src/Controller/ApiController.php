@@ -368,7 +368,7 @@ class ApiController extends AbstractController
         }
     }
 
-    #[Route('/api/orders/{id}', name: 'api_order_show', methods: ['GET'])]
+    #[Route('/api/orders/{id}', name: 'api_order_show', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function orderShow(int $id, OrderRepository $orderRepository): JsonResponse
     {
         try {

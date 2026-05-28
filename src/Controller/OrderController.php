@@ -227,18 +227,23 @@ final class OrderController extends AbstractController
             // Send FCM notification if status changed (don't fail if FCM fails)
             if ($oldStatus !== $order->getStatus()) {
                 try {
+                    error_log('[FCM] Status changed from ' . $oldStatus . ' to ' . $order->getStatus());
                     $customer = $order->getCustomer();
                     if ($customer && $customer->getCreatedBy() && $customer->getCreatedBy()->getFcmToken()) {
-                        $this->fcmService->sendOrderStatusNotification(
+                        error_log('[FCM] Sending notification to token: ' . $customer->getCreatedBy()->getFcmToken());
+                        $result = $this->fcmService->sendOrderStatusNotification(
                             $customer->getCreatedBy()->getFcmToken(),
                             $order->getOrderNumber(),
                             $order->getStatus(),
                             $customer->getName()
                         );
+                        error_log('[FCM] Notification result: ' . ($result ? 'SUCCESS' : 'FAILED'));
+                    } else {
+                        error_log('[FCM] No FCM token found for customer');
                     }
                 } catch (\Exception $e) {
                     // Log FCM error but don't fail the order update
-                    error_log('FCM notification failed: ' . $e->getMessage());
+                    error_log('[FCM] Notification failed: ' . $e->getMessage());
                 }
             }
 

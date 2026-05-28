@@ -3,7 +3,7 @@
 {% block title %}Dashboard - Samaco Brewery{% endblock %}
 
 {% block dashboard_content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6" data-user-id="{% if app.user %}{{ app.user.id }}{% endif %}" data-mercure-url="https://mercure-staging-95d9.up.railway.app/.well-known/mercure?topic=/orders/new">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6" data-user-id="{% if app.user %}{{ app.user.id }}{% endif %}" data-mercure-url="https://mercure-staging-95d9.up.railway.app/.well-known/mercure?topic=/orders/new&topic=/orders/update">
     
     <!-- Real-time Notification Banner -->
     <div id="notification-banner" class="hidden fixed top-4 right-4 z-50 max-w-sm">
@@ -399,51 +399,62 @@
         // Mercure WebSocket Connection for Real-time Notifications
         (function() {
             const dashboard = document.querySelector('[data-mercure-url]');
-            if (!dashboard) return;
+            if (!dashboard) {
+                console.error('[MERCURE] Dashboard element not found');
+                return;
+            }
 
             const mercureUrl = dashboard.getAttribute('data-mercure-url');
-            const newTopic = encodeURIComponent('orders/new');
-            const updateTopic = encodeURIComponent('orders/update');
-            const fullUrl = mercureUrl + '&topic=' + newTopic + '&topic=' + updateTopic;
+            console.log('[MERCURE] Mercure URL from data attribute:', mercureUrl);
 
-            console.log('[MERCURE] Attempting to connect to:', fullUrl);
+            if (!mercureUrl) {
+                console.error('[MERCURE] Mercure URL is empty');
+                return;
+            }
+
+            console.log('[MERCURE] Attempting to connect to:', mercureUrl);
 
             try {
-                const eventSource = new EventSource(fullUrl);
+                const eventSource = new EventSource(mercureUrl);
 
                 eventSource.onmessage = (event) => {
                     console.log('[MERCURE] Received event:', event.data);
-                    const order = JSON.parse(event.data);
-
-                    if (order.updatedAt) {
-                        showNotification('Order Updated', `Order #${order.id} status changed to ${order.status}`);
-                        // Reload the page to show updated orders
-                        setTimeout(() => location.reload(), 2000);
-                    } else {
-                        showNotification('New Order', `Order #${order.orderNumber} from ${order.customerName} - ₱${order.total}`);
-                        // Reload the page to show new orders
-                        setTimeout(() => location.reload(), 2000);
-                    }
-
-                    // Play notification sound
                     try {
-                        const audio = new Audio('/sounds/notification.mp3');
-                        audio.play().catch(e => console.log('Audio play failed:', e));
-                    } catch (e) {
-                        console.log('Audio not available:', e);
+                        const order = JSON.parse(event.data);
+
+                        if (order.updatedAt) {
+                            showNotification('Order Updated', `Order #${order.id} status changed to ${order.status}`);
+                            // Reload the page to show updated orders
+                            setTimeout(() => location.reload(), 2000);
+                        } else {
+                            showNotification('New Order', `Order #${order.orderNumber} from ${order.customerName} - ₱${order.total}`);
+                            // Reload the page to show new orders
+                            setTimeout(() => location.reload(), 2000);
+                        }
+
+                        // Play notification sound
+                        try {
+                            const audio = new Audio('/sounds/notification.mp3');
+                            audio.play().catch(e => console.log('Audio play failed:', e));
+                        } catch (e) {
+                            console.log('Audio not available:', e);
+                        }
+                    } catch (parseError) {
+                        console.error('[MERCURE] Failed to parse event data:', parseError);
                     }
                 };
 
                 eventSource.onerror = (error) => {
                     console.error('[MERCURE] Connection error:', error);
+                    console.error('[MERCURE] EventSource readyState:', eventSource.readyState);
                     eventSource.close();
                 };
 
                 eventSource.onopen = () => {
-                    console.log('[MERCURE] Connected successfully to:', fullUrl);
+                    console.log('[MERCURE] Connected successfully to:', mercureUrl);
                 };
             } catch (error) {
-                console.error('[MERCURE] Failed to connect:', error);
+                console.error('[MERCURE] Failed to create EventSource:', error);
             }
         })();
     </script>

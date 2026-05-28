@@ -3,7 +3,7 @@
 {% block title %}Dashboard - Samaco Brewery{% endblock %}
 
 {% block dashboard_content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6" data-user-id="{% if app.user %}{{ app.user.id }}{% endif %}" data-mercure-url="{{ app.request.scheme ~ '://' ~ app.request.httpHost ~ '/.well-known/mercure?topic=/orders/new' }}">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6" data-user-id="{% if app.user %}{{ app.user.id }}{% endif %}" data-mercure-url="https://mercure-staging-95d9.up.railway.app/.well-known/mercure?topic=/orders/new">
     
     <!-- Real-time Notification Banner -->
     <div id="notification-banner" class="hidden fixed top-4 right-4 z-50 max-w-sm">

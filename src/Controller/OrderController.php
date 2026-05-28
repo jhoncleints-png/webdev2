@@ -142,27 +142,32 @@ final class OrderController extends AbstractController
             $entityManager->persist($order);
             $entityManager->flush();
 
-            // Publish to Mercure for real-time notifications
-            $update = new Update(
-                'orders/new',
-                json_encode([
-                    'id' => $order->getId(),
-                    'orderNumber' => $order->getOrderNumber(),
-                    'customer' => $order->getCustomer()->getEmail(),
-                    'customerName' => $order->getCustomer()->getName(),
-                    'total' => $order->getTotalAmount(),
-                    'status' => $order->getStatus(),
-                    'items' => array_map(function($item) {
-                        return [
-                            'productName' => $item->getProduct()->getName(),
-                            'quantity' => $item->getQuantity(),
-                            'price' => $item->getUnitPrice()
-                        ];
-                    }, $order->getOrderItems()->toArray()),
-                    'createdAt' => $order->getOrderDate()->format('Y-m-d H:i:s')
-                ])
-            );
-            $this->mercureHub->publish($update);
+            // Publish to Mercure for real-time notifications (optional)
+            try {
+                $update = new Update(
+                    'orders/new',
+                    json_encode([
+                        'id' => $order->getId(),
+                        'orderNumber' => $order->getOrderNumber(),
+                        'customer' => $order->getCustomer()->getEmail(),
+                        'customerName' => $order->getCustomer()->getName(),
+                        'total' => $order->getTotalAmount(),
+                        'status' => $order->getStatus(),
+                        'items' => array_map(function($item) {
+                            return [
+                                'productName' => $item->getProduct()->getName(),
+                                'quantity' => $item->getQuantity(),
+                                'price' => $item->getUnitPrice()
+                            ];
+                        }, $order->getOrderItems()->toArray()),
+                        'createdAt' => $order->getOrderDate()->format('Y-m-d H:i:s')
+                    ])
+                );
+                $this->mercureHub->publish($update);
+            } catch (\Exception $e) {
+                // Mercure is optional, don't fail if it's not available
+                error_log('Mercure publish failed: ' . $e->getMessage());
+            }
 
             // LOG ORDER CREATION
             $this->activityLogger->log(
@@ -247,18 +252,23 @@ final class OrderController extends AbstractController
 
             $entityManager->flush();
 
-            // Publish status update to Mercure
-            $update = new Update(
-                'orders/update',
-                json_encode([
-                    'id' => $order->getId(),
-                    'orderNumber' => $order->getOrderNumber(),
-                    'status' => $order->getStatus(),
-                    'customerName' => $order->getCustomer()->getName(),
-                    'updatedAt' => $order->getOrderDate()->format('Y-m-d H:i:s')
-                ])
-            );
-            $this->mercureHub->publish($update);
+            // Publish status update to Mercure (optional)
+            try {
+                $update = new Update(
+                    'orders/update',
+                    json_encode([
+                        'id' => $order->getId(),
+                        'orderNumber' => $order->getOrderNumber(),
+                        'status' => $order->getStatus(),
+                        'customerName' => $order->getCustomer()->getName(),
+                        'updatedAt' => $order->getOrderDate()->format('Y-m-d H:i:s')
+                    ])
+                );
+                $this->mercureHub->publish($update);
+            } catch (\Exception $e) {
+                // Mercure is optional, don't fail if it's not available
+                error_log('Mercure publish failed: ' . $e->getMessage());
+            }
 
             // LOG ORDER UPDATE
             $newStatus = $order->getStatus();

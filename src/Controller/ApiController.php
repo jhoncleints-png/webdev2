@@ -395,7 +395,7 @@ class ApiController extends AbstractController
             }
 
             // Check if user has access to this order
-            if ($order->getCreatedBy()->getId() !== $user->getId() && !$this->isGranted('ROLE_ADMIN')) {
+            if ($order->getCreatedBy() && $order->getCreatedBy()->getId() !== $user->getId() && !$this->isGranted('ROLE_ADMIN')) {
                 return $this->createErrorResponse('Access denied to this order', 403, 'ACCESS_DENIED');
             }
 
@@ -483,6 +483,10 @@ class ApiController extends AbstractController
 
             $since = $request->query->get('since');
             $sinceDate = $since ? new \DateTime($since) : null;
+
+            if ($since && !$sinceDate) {
+                return $this->createErrorResponse('Invalid date format for since parameter', 400, 'INVALID_DATE');
+            }
 
             $criteria = ['createdBy' => $user];
             if ($sinceDate) {

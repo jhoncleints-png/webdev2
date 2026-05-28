@@ -400,23 +400,31 @@
         (function() {
             const dashboard = document.querySelector('[data-mercure-url]');
             if (!dashboard) return;
-            
+
             const mercureUrl = dashboard.getAttribute('data-mercure-url');
+            const newTopic = encodeURIComponent('orders/new');
             const updateTopic = encodeURIComponent('orders/update');
-            const fullUrl = mercureUrl + '&topic=' + updateTopic;
-            
+            const fullUrl = mercureUrl + '&topic=' + newTopic + '&topic=' + updateTopic;
+
+            console.log('[MERCURE] Attempting to connect to:', fullUrl);
+
             try {
                 const eventSource = new EventSource(fullUrl);
 
                 eventSource.onmessage = (event) => {
+                    console.log('[MERCURE] Received event:', event.data);
                     const order = JSON.parse(event.data);
-                    
+
                     if (order.updatedAt) {
                         showNotification('Order Updated', `Order #${order.id} status changed to ${order.status}`);
+                        // Reload the page to show updated orders
+                        setTimeout(() => location.reload(), 2000);
                     } else {
                         showNotification('New Order', `Order #${order.orderNumber} from ${order.customerName} - ₱${order.total}`);
+                        // Reload the page to show new orders
+                        setTimeout(() => location.reload(), 2000);
                     }
-                    
+
                     // Play notification sound
                     try {
                         const audio = new Audio('/sounds/notification.mp3');
@@ -427,11 +435,13 @@
                 };
 
                 eventSource.onerror = (error) => {
-                    console.error('Mercure connection error:', error);
-                    // Don't close on error, let it retry
+                    console.error('[MERCURE] Connection error:', error);
+                    eventSource.close();
                 };
 
-                console.log('[MERCURE] Connected to:', fullUrl);
+                eventSource.onopen = () => {
+                    console.log('[MERCURE] Connected successfully to:', fullUrl);
+                };
             } catch (error) {
                 console.error('[MERCURE] Failed to connect:', error);
             }

@@ -211,6 +211,67 @@ final class OrderController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}/cancel', name: 'app_order_cancel', methods: ['PATCH'])]
+    public function cancel(Order $order, EntityManagerInterface $entityManager): Response
+    {
+        // Prevent cancelling already cancelled or delivered orders
+        if ($order->getStatus() === Order::STATUS_CANCELLED) {
+            return $this->json(['error' => 'Order already cancelled'], 400);
+        }
+        if ($order->getStatus() === Order::STATUS_DELIVERED) {
+            return $this->json(['error' => 'Cannot cancel delivered orders'], 400);
+        }
+
+        $oldStatus = $order->getStatus();
+        $order->setStatus(Order::STATUS_CANCELLED);
+
+        // Restore stock
+        $stockUpdates = $this->restoreStock($order, $entityManager);
+        foreach ($stockUpdates as $update) {
+            $this->activityLogger->log(
+                $this->getUser(),
+                'STOCK_RESTORE',
+                'Product',
+                null,
+                $update . " (Order cancelled)"
+            );
+        }
+
+        $entityManager->flush();
+
+        // Publish status update to Mercure (optional)
+        try {
+            $update = new Update(
+                'orders/update',
+                json_encode([
+                    'id' => $order->getId(),
+                    'orderNumber' => $order->getOrderNumber(),
+                    'status' => $order->getStatus(),
+                    'customerName' => $order->getCustomer()->getName(),
+                    'updatedAt' => $order->getOrderDate()->format('Y-m-d H:i:s')
+                ])
+            );
+            $this->mercureHub->publish($update);
+        } catch (\Exception $e) {
+            error_log('Mercure publish failed: ' . $e->getMessage());
+        }
+
+        // Log the cancellation
+        $this->activityLogger->log(
+            $this->getUser(),
+            'CANCEL_ORDER',
+            'Order',
+            $order->getId(),
+            "Cancelled order: {$order->getOrderNumber()} (ID: {$order->getId()}, Previous status: {$oldStatus})"
+        );
+
+        return $this->json([
+            'id' => $order->getId(),
+            'status' => $order->getStatus(),
+            'message' => 'Order cancelled successfully'
+        ]);
+    }
+
     #[Route('/{id}/edit', name: 'app_order_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Order $order, EntityManagerInterface $entityManager): Response
     {

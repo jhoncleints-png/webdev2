@@ -260,7 +260,7 @@
                 const response = await fetch('/api/orders');
                 const data = await response.json();
                 const orders = data['hydra:member'] || data.orders || data;
-                const newOrderCount = orders.length;
+                const newOrderCount = Array.isArray(orders) ? orders.length : 0;
 
                 if (newOrderCount !== currentOrderCount) {
                     console.log('New order detected! Refreshing...');

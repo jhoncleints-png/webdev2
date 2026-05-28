@@ -224,16 +224,21 @@ final class OrderController extends AbstractController
 
             $entityManager->flush();
 
-            // Send FCM notification if status changed
+            // Send FCM notification if status changed (don't fail if FCM fails)
             if ($oldStatus !== $order->getStatus()) {
-                $customer = $order->getCustomer();
-                if ($customer && $customer->getUser() && $customer->getUser()->getFcmToken()) {
-                    $this->fcmService->sendOrderStatusNotification(
-                        $customer->getUser()->getFcmToken(),
-                        $order->getOrderNumber(),
-                        $order->getStatus(),
-                        $customer->getName()
-                    );
+                try {
+                    $customer = $order->getCustomer();
+                    if ($customer && $customer->getUser() && $customer->getUser()->getFcmToken()) {
+                        $this->fcmService->sendOrderStatusNotification(
+                            $customer->getUser()->getFcmToken(),
+                            $order->getOrderNumber(),
+                            $order->getStatus(),
+                            $customer->getName()
+                        );
+                    }
+                } catch (\Exception $e) {
+                    // Log FCM error but don't fail the order update
+                    error_log('FCM notification failed: ' . $e->getMessage());
                 }
             }
 

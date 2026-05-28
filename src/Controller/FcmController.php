@@ -10,7 +10,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[Route('/api')]
 class FcmController extends AbstractController
 {
     public function __construct(
@@ -18,7 +17,7 @@ class FcmController extends AbstractController
         private EntityManagerInterface $entityManager
     ) {}
 
-    #[Route('/fcm/register', name: 'api_fcm_register', methods: ['POST'])]
+    #[Route('/api/fcm/register', name: 'api_fcm_register', methods: ['POST'])]
     public function registerFcmToken(Request $request): JsonResponse
     {
         try {

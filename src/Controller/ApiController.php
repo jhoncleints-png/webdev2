@@ -368,6 +368,16 @@ class ApiController extends AbstractController
         }
     }
 
+    #[Route('/api/orders/count', name: 'api_orders_count', methods: ['GET'])]
+    public function getOrderCount(OrderRepository $orderRepository): JsonResponse
+    {
+        error_log('[API ORDERS COUNT] Getting order count');
+        $orders = $orderRepository->findBy([], ['id' => 'DESC']);
+        $orderNumbers = array_map(fn($order) => $order->getOrderNumber(), $orders);
+        error_log('[API ORDERS COUNT] Returning ' . count($orderNumbers) . ' orders');
+        return $this->json(['orderNumbers' => $orderNumbers]);
+    }
+
     #[Route('/api/orders/{id}', name: 'api_order_show', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function orderShow(int $id, OrderRepository $orderRepository): JsonResponse
     {

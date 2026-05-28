@@ -279,7 +279,6 @@ final class OrderController extends AbstractController
     }
 
     #[Route('/api/orders/count', name: 'api_orders_count', methods: ['GET'])]
-    #[IsGranted('PUBLIC_ACCESS')]
     public function getOrderCount(OrderRepository $orderRepository): JsonResponse
     {
         error_log('[API ORDERS COUNT] Getting order count');

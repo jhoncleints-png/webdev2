@@ -264,21 +264,16 @@
 
         setInterval(async () => {
             try {
-                const response = await fetch('/api/orders');
+                const response = await fetch('/order/api/orders/count');
                 const data = await response.json();
-                const orders = data['hydra:member'] || data.orders || data;
-                const orderArray = Array.isArray(orders) ? orders : [];
+                const orderNumbers = data.orderNumbers || [];
 
-                const newOrderIds = new Set();
+                const newOrderIds = new Set(orderNumbers);
                 let hasNewOrder = false;
 
-                orderArray.forEach(order => {
-                    const orderNumber = order.orderNumber || order['@id']?.split('/').pop();
-                    if (orderNumber) {
-                        newOrderIds.add(orderNumber);
-                        if (!currentOrderIds.has(orderNumber)) {
-                            hasNewOrder = true;
-                        }
+                orderNumbers.forEach(orderNumber => {
+                    if (!currentOrderIds.has(orderNumber)) {
+                        hasNewOrder = true;
                     }
                 });
 

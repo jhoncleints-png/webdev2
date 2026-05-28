@@ -269,6 +269,14 @@ final class OrderController extends AbstractController
         ]);
     }
 
+    #[Route('/api/orders/count', name: 'api_orders_count', methods: ['GET'])]
+    public function getOrderCount(OrderRepository $orderRepository): JsonResponse
+    {
+        $orders = $orderRepository->findAll();
+        $orderNumbers = array_map(fn($order) => $order->getOrderNumber(), $orders);
+        return new JsonResponse(['orderNumbers' => $orderNumbers]);
+    }
+
     #[Route('/{id}', name: 'app_order_delete', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN')]
     public function delete(Request $request, Order $order, EntityManagerInterface $entityManager): Response

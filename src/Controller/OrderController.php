@@ -228,9 +228,9 @@ final class OrderController extends AbstractController
             if ($oldStatus !== $order->getStatus()) {
                 try {
                     $customer = $order->getCustomer();
-                    if ($customer && $customer->getUser() && $customer->getUser()->getFcmToken()) {
+                    if ($customer && $customer->getCreatedBy() && $customer->getCreatedBy()->getFcmToken()) {
                         $this->fcmService->sendOrderStatusNotification(
-                            $customer->getUser()->getFcmToken(),
+                            $customer->getCreatedBy()->getFcmToken(),
                             $order->getOrderNumber(),
                             $order->getStatus(),
                             $customer->getName()

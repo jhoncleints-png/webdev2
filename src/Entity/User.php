@@ -99,6 +99,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $registrationSource = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $fcmToken = null;
+
     // Constructor
     public function __construct()
     {
@@ -347,6 +350,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
     public function setRegistrationSource(?string $registrationSource): static
     {
         $this->registrationSource = $registrationSource;
+
+        return $this;
+    }
+
+    public function getFcmToken(): ?string
+    {
+        return $this->fcmToken;
+    }
+
+    public function setFcmToken(?string $fcmToken): static
+    {
+        $this->fcmToken = $fcmToken;
 
         return $this;
     }

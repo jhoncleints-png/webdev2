@@ -18,8 +18,6 @@ use Doctrine\DBAL\Exception as DBALException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Mercure\HubInterface;
-use Symfony\Component\Mercure\Update;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -41,15 +39,6 @@ class ApiController extends AbstractController
         }
         
         return $this->json($response, $code);
-    }
-
-    private function publishUpdate(string $topic, array $data, HubInterface $hub): void
-    {
-        $update = new Update(
-            $topic,
-            json_encode($data)
-        );
-        $hub->publish($update);
     }
 
     #[Route('/api/me', name: 'api_me', methods: ['GET'])]
@@ -473,7 +462,7 @@ class ApiController extends AbstractController
     }
 
     #[Route('/api/sync/orders', name: 'api_sync_orders', methods: ['GET'])]
-    public function syncOrders(Request $request, OrderRepository $orderRepository, HubInterface $hub): JsonResponse
+    public function syncOrders(Request $request, OrderRepository $orderRepository): JsonResponse
     {
         try {
             $user = $this->getUser();
@@ -528,13 +517,6 @@ class ApiController extends AbstractController
             }
 
             // Publish to Mercure for real-time updates
-            $this->publishUpdate('/orders/' . $user->getId(), [
-                'type' => 'orders_sync',
-                'data' => $data,
-                'count' => count($data),
-                'synced_at' => (new \DateTime())->format('Y-m-d H:i:s')
-            ], $hub);
-
             return $this->json([
                 'orders' => $data,
                 'count' => count($data),
@@ -551,8 +533,7 @@ class ApiController extends AbstractController
     public function cancelOrder(
         int $id,
         OrderRepository $orderRepository,
-        EntityManagerInterface $entityManager,
-        HubInterface $hub
+        EntityManagerInterface $entityManager
     ): JsonResponse {
         try {
             $user = $this->getUser();
@@ -590,19 +571,6 @@ class ApiController extends AbstractController
 
             $entityManager->flush();
 
-            // Publish to Mercure (optional)
-            try {
-                $this->publishUpdate('/orders/update', [
-                    'id' => $order->getId(),
-                    'orderNumber' => $order->getOrderNumber(),
-                    'status' => $order->getStatus(),
-                    'customerName' => $order->getCustomer()->getName(),
-                    'updatedAt' => $order->getOrderDate()->format('Y-m-d H:i:s')
-                ], $hub);
-            } catch (\Exception $e) {
-                // Mercure is optional
-            }
-
             return $this->json([
                 'id' => $order->getId(),
                 'status' => $order->getStatus(),
@@ -616,7 +584,7 @@ class ApiController extends AbstractController
     }
 
     #[Route('/api/sync/products', name: 'api_sync_products', methods: ['GET'])]
-    public function syncProducts(Request $request, ProductRepository $productRepository, HubInterface $hub): JsonResponse
+    public function syncProducts(Request $request, ProductRepository $productRepository): JsonResponse
     {
         try {
             $since = $request->query->get('since');
@@ -649,14 +617,6 @@ class ApiController extends AbstractController
                 ];
             }
 
-            // Publish to Mercure for real-time updates
-            $this->publishUpdate('/products', [
-                'type' => 'products_sync',
-                'data' => $data,
-                'count' => count($data),
-                'synced_at' => (new \DateTime())->format('Y-m-d H:i:s')
-            ], $hub);
-
             return $this->json([
                 'products' => $data,
                 'count' => count($data),
@@ -670,7 +630,7 @@ class ApiController extends AbstractController
     }
 
     #[Route('/api/sync/activity', name: 'api_sync_activity', methods: ['GET'])]
-    public function syncActivity(Request $request, ActivityLogRepository $activityLogRepository, HubInterface $hub): JsonResponse
+    public function syncActivity(Request $request, ActivityLogRepository $activityLogRepository): JsonResponse
     {
         try {
             $user = $this->getUser();
@@ -707,14 +667,6 @@ class ApiController extends AbstractController
                     'createdAt' => $activity->getCreatedAt()->format('Y-m-d H:i:s'),
                 ];
             }
-
-            // Publish to Mercure for real-time updates
-            $this->publishUpdate('/activity/' . $user->getId(), [
-                'type' => 'activity_sync',
-                'data' => $data,
-                'count' => count($data),
-                'synced_at' => (new \DateTime())->format('Y-m-d H:i:s')
-            ], $hub);
 
             return $this->json([
                 'activities' => $data,

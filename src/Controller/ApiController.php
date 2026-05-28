@@ -533,21 +533,20 @@ class ApiController extends AbstractController
     public function cancelOrder(
         int $id,
         OrderRepository $orderRepository,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        Request $request
     ): JsonResponse {
         try {
-            $user = $this->getUser();
-            if (!$user) {
-                return $this->createErrorResponse('Not authenticated', 401, 'AUTH_REQUIRED');
-            }
+            $data = json_decode($request->getContent(), true);
+            $email = $data['email'] ?? null;
 
             $order = $orderRepository->find($id);
             if (!$order) {
                 return $this->createErrorResponse('Order not found', 404, 'ORDER_NOT_FOUND');
             }
 
-            // Check if user owns this order
-            if ($order->getCreatedBy()->getId() !== $user->getId()) {
+            // Check if user owns this order via email
+            if ($email && $order->getCustomer()->getCreatedBy() && $order->getCustomer()->getCreatedBy()->getEmail() !== $email) {
                 return $this->createErrorResponse('You can only cancel your own orders', 403, 'FORBIDDEN');
             }
 

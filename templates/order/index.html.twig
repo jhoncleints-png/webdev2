@@ -253,19 +253,39 @@
         }
 
         // Polling for new orders - eliminates F5 for admin
-        let currentOrderCount = parseInt(document.getElementById('orderTable').dataset.orderCount || '0');
+        let currentOrderIds = new Set();
+        // Initialize with current order IDs from the table
+        document.querySelectorAll('#orderTable tbody tr').forEach(row => {
+            const orderNumber = row.querySelector('td:first-child')?.textContent?.trim();
+            if (orderNumber) {
+                currentOrderIds.add(orderNumber);
+            }
+        });
 
         setInterval(async () => {
             try {
                 const response = await fetch('/api/orders');
                 const data = await response.json();
                 const orders = data['hydra:member'] || data.orders || data;
-                const newOrderCount = Array.isArray(orders) ? orders.length : 0;
+                const orderArray = Array.isArray(orders) ? orders : [];
 
-                if (newOrderCount !== currentOrderCount) {
+                const newOrderIds = new Set();
+                let hasNewOrder = false;
+
+                orderArray.forEach(order => {
+                    const orderNumber = order.orderNumber || order['@id']?.split('/').pop();
+                    if (orderNumber) {
+                        newOrderIds.add(orderNumber);
+                        if (!currentOrderIds.has(orderNumber)) {
+                            hasNewOrder = true;
+                        }
+                    }
+                });
+
+                if (hasNewOrder) {
                     console.log('New order detected! Refreshing...');
                     showNotification('📦 New order received!', 'success');
-                    currentOrderCount = newOrderCount;
+                    currentOrderIds = newOrderIds;
                     setTimeout(() => location.reload(), 2000);
                 }
             } catch (error) {

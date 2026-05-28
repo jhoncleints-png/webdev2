@@ -186,8 +186,12 @@ final class OrderController extends AbstractController
     #[Route('/{id}/edit', name: 'app_order_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Order $order, EntityManagerInterface $entityManager): Response
     {
+        error_log('[ORDER EDIT] Editing order: ' . $order->getOrderNumber() . ' (ID: ' . $order->getId() . ')');
+        error_log('[ORDER EDIT] Current status: ' . $order->getStatus());
+
         // Prevent editing of delivered orders
         if ($order->getStatus() === Order::STATUS_DELIVERED) {
+            error_log('[ORDER EDIT] Cannot edit delivered order');
             $this->addFlash('error', 'Cannot edit delivered orders.');
             return $this->redirectToRoute('app_order_show', ['id' => $order->getId()]);
         }
@@ -277,8 +281,10 @@ final class OrderController extends AbstractController
     #[Route('/api/orders/count', name: 'api_orders_count', methods: ['GET'])]
     public function getOrderCount(OrderRepository $orderRepository): JsonResponse
     {
+        error_log('[API ORDERS COUNT] Getting order count');
         $orders = $orderRepository->findBy([], ['id' => 'DESC']);
         $orderNumbers = array_map(fn($order) => $order->getOrderNumber(), $orders);
+        error_log('[API ORDERS COUNT] Returning ' . count($orderNumbers) . ' orders');
         return new JsonResponse(['orderNumbers' => $orderNumbers]);
     }
 

@@ -536,12 +536,15 @@ class ApiController extends AbstractController
         EntityManagerInterface $entityManager,
         Request $request
     ): JsonResponse {
+        error_log('[API CANCEL] Cancel order request for ID: ' . $id);
         try {
             $data = json_decode($request->getContent(), true);
             $email = $data['email'] ?? null;
+            error_log('[API CANCEL] Email: ' . ($email ?: 'not provided'));
 
             $order = $orderRepository->find($id);
             if (!$order) {
+                error_log('[API CANCEL] Order not found');
                 return $this->createErrorResponse('Order not found', 404, 'ORDER_NOT_FOUND');
             }
 

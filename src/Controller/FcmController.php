@@ -21,33 +21,41 @@ class FcmController extends AbstractController
     #[Route('/api/fcm/register', name: 'api_fcm_register', methods: ['POST'])]
     public function registerFcmToken(Request $request, UserRepository $userRepository): JsonResponse
     {
+        error_log('[FCM REGISTER] Token registration request received');
         try {
             $data = json_decode($request->getContent(), true);
             $fcmToken = $data['token'] ?? null;
             $email = $data['email'] ?? null;
+            error_log('[FCM REGISTER] Email: ' . ($email ?: 'not provided'));
+            error_log('[FCM REGISTER] Token: ' . ($fcmToken ? substr($fcmToken, 0, 20) . '...' : 'not provided'));
 
             if (!$fcmToken) {
+                error_log('[FCM REGISTER] FCM token is required');
                 return $this->json(['error' => 'FCM token is required'], 400);
             }
 
             if (!$email) {
+                error_log('[FCM REGISTER] Email is required');
                 return $this->json(['error' => 'Email is required'], 400);
             }
 
             $user = $userRepository->findOneBy(['email' => $email]);
 
             if (!$user) {
+                error_log('[FCM REGISTER] User not found for email: ' . $email);
                 return $this->json(['error' => 'User not found'], 404);
             }
 
             $user->setFcmToken($fcmToken);
             $this->entityManager->flush();
+            error_log('[FCM REGISTER] Token saved successfully for user: ' . $email);
 
             return $this->json([
                 'success' => true,
                 'message' => 'FCM token registered successfully'
             ]);
         } catch (\Exception $e) {
+            error_log('[FCM REGISTER] Error: ' . $e->getMessage());
             return $this->json([
                 'success' => false,
                 'error' => $e->getMessage()

@@ -222,6 +222,18 @@ class ApiController extends AbstractController
             // Create notification for new order (outside transaction)
             $this->notificationService->notifyNewOrder($order);
 
+            // Broadcast WebSocket message for new order
+            try {
+                \App\Service\WebSocketBroadcaster::broadcastNewOrder([
+                    'orderNumber' => $order->getOrderNumber(),
+                    'customerName' => $customer->getName(),
+                    'totalAmount' => $order->getTotalAmount(),
+                    'status' => $order->getStatus(),
+                ]);
+            } catch (\Exception $e) {
+                error_log('[WEBSOCKET] Failed to broadcast new order: ' . $e->getMessage());
+            }
+
             // Check for low stock after order
             foreach ($lineItems as $line) {
                 if ($line['product']->getStockQuantity() <= 10) {
@@ -541,64 +553,6 @@ class ApiController extends AbstractController
         } catch (\Exception $e) {
             return $this->createErrorResponse('An error occurred while syncing orders', 500, 'SERVER_ERROR');
         }
-    }
-
-    #[Route('/api/orders/events', name: 'api_orders_events', methods: ['GET'])]
-    public function orderEvents(OrderRepository $orderRepository): StreamedResponse
-    {
-        error_log('[SSE] New SSE connection established');
-        
-        // Get initial order count
-        $initialOrderCount = $orderRepository->count([]);
-        error_log('[SSE] Initial order count: ' . $initialOrderCount);
-        
-        return new StreamedResponse(function () use ($orderRepository, $initialOrderCount) {
-            // Set SSE headers
-            header('Content-Type: text/event-stream');
-            header('Cache-Control: no-cache');
-            header('Connection: keep-alive');
-            header('X-Accel-Buffering: no'); // Disable nginx buffering
-            
-            // Send initial connection message
-            echo "event: connected\n";
-            echo "data: {\"message\":\"SSE connection established\",\"orderCount\":$initialOrderCount}\n\n";
-            ob_flush();
-            flush();
-            
-            $lastOrderCount = $initialOrderCount;
-            $counter = 0;
-            
-            while (true) {
-                $counter++;
-                
-                // Check for new orders every 5 seconds
-                $currentOrderCount = $orderRepository->count([]);
-                
-                if ($currentOrderCount > $lastOrderCount) {
-                    error_log('[SSE] New order detected! Count changed from ' . $lastOrderCount . ' to ' . $currentOrderCount);
-                    echo "event: order_update\n";
-                    echo "data: {\"type\":\"new_order\",\"orderCount\":$currentOrderCount}\n\n";
-                    ob_flush();
-                    flush();
-                    $lastOrderCount = $currentOrderCount;
-                }
-                
-                // Send heartbeat every 15 seconds
-                if ($counter % 3 === 0) {
-                    echo ": heartbeat\n\n";
-                    ob_flush();
-                    flush();
-                }
-                
-                // Check for connection closed
-                if (connection_aborted()) {
-                    error_log('[SSE] Connection closed by client');
-                    break;
-                }
-                
-                sleep(5);
-            }
-        });
     }
 
     #[Route('/api/orders/{id}/cancel', name: 'api_order_cancel', methods: ['PATCH'])]

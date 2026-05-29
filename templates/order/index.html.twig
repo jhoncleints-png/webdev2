@@ -252,47 +252,38 @@
             });
         }
 
-        // Polling for new orders - eliminates F5 for admin
-        var currentOrderIds = new Set();
-        // Initialize with current order IDs from the table
-        var rows = document.querySelectorAll('#orderTable tbody tr');
-        for (var i = 0; i < rows.length; i++) {
-            var row = rows[i];
-            var firstCell = row.querySelector('td:first-child');
-            if (firstCell) {
-                var orderNumber = firstCell.textContent ? firstCell.textContent.trim() : '';
-                if (orderNumber) {
-                    currentOrderIds.add(orderNumber);
-                }
-            }
-        }
-
-        // SSE for real-time order updates
-        var eventSource = new EventSource('/api/orders/events');
+        // WebSocket for real-time order updates
+        var wsProtocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+        var wsHost = window.location.hostname;
+        var wsPort = '8080'; // WebSocket port
+        var ws = new WebSocket(wsProtocol + wsHost + ':' + wsPort);
         
-        eventSource.addEventListener('connected', function(event) {
-            console.log('[SSE] Connected to server:', event.data);
-        });
+        ws.onopen = function() {
+            console.log('[WEBSOCKET] Connected to server');
+        };
         
-        eventSource.addEventListener('order_update', function(event) {
-            console.log('[SSE] Order update received:', event.data);
+        ws.onmessage = function(event) {
+            console.log('[WEBSOCKET] Message received:', event.data);
             var data = JSON.parse(event.data);
             
             if (data.type === 'new_order') {
                 showNotification('📦 New order received!', 'success');
                 setTimeout(function() { location.reload(); }, 2000);
-            } else if (data.type === 'status_change') {
-                showNotification('📝 Order status updated', 'info');
+            } else if (data.type === 'order_update') {
+                showNotification('📝 Order updated', 'info');
                 setTimeout(function() { location.reload(); }, 2000);
             }
-        });
+        };
         
-        eventSource.onerror = function(error) {
-            console.error('[SSE] Connection error:', error);
-            eventSource.close();
+        ws.onerror = function(error) {
+            console.error('[WEBSOCKET] Error:', error);
+        };
+        
+        ws.onclose = function() {
+            console.log('[WEBSOCKET] Connection closed');
             // Reconnect after 5 seconds
             setTimeout(function() {
-                console.log('[SSE] Reconnecting...');
+                console.log('[WEBSOCKET] Reconnecting...');
                 location.reload();
             }, 5000);
         };
@@ -305,6 +296,7 @@
             document.body.appendChild(toast);
             setTimeout(function() { toast.remove(); }, 3000);
         }
+
     });
 </script>
 {% endblock %}

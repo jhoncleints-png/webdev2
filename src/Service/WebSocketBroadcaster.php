@@ -4,20 +4,28 @@ namespace App\Service;
 
 class WebSocketBroadcaster
 {
-    private static ?\App\WebSocket\OrderWebSocketServer $server = null;
+    private static string $queueFile;
 
-    public static function setServer(\App\WebSocket\OrderWebSocketServer $server): void
+    public static function init(): void
     {
-        self::$server = $server;
+        self::$queueFile = sys_get_temp_dir() . '/websocket_queue.txt';
     }
 
     public static function broadcast(string $type, array $data): void
     {
-        if (self::$server) {
-            self::$server->broadcast($type, $data);
-        } else {
-            error_log('[WEBSOCKET BROADCASTER] Server not set, cannot broadcast');
+        if (!isset(self::$queueFile)) {
+            self::init();
         }
+
+        $message = json_encode([
+            'type' => $type,
+            'data' => $data,
+            'timestamp' => time()
+        ]);
+
+        // Write to queue file for WebSocket server to read
+        file_put_contents(self::$queueFile, $message . PHP_EOL, FILE_APPEND | LOCK_EX);
+        error_log('[WEBSOCKET BROADCASTER] Queued message: ' . $type);
     }
 
     public static function broadcastNewOrder(array $orderData): void

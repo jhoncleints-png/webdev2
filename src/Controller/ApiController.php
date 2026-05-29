@@ -543,6 +543,64 @@ class ApiController extends AbstractController
         }
     }
 
+    #[Route('/api/orders/events', name: 'api_orders_events', methods: ['GET'])]
+    public function orderEvents(OrderRepository $orderRepository): StreamedResponse
+    {
+        error_log('[SSE] New SSE connection established');
+        
+        // Get initial order count
+        $initialOrderCount = $orderRepository->count([]);
+        error_log('[SSE] Initial order count: ' . $initialOrderCount);
+        
+        return new StreamedResponse(function () use ($orderRepository, $initialOrderCount) {
+            // Set SSE headers
+            header('Content-Type: text/event-stream');
+            header('Cache-Control: no-cache');
+            header('Connection: keep-alive');
+            header('X-Accel-Buffering: no'); // Disable nginx buffering
+            
+            // Send initial connection message
+            echo "event: connected\n";
+            echo "data: {\"message\":\"SSE connection established\",\"orderCount\":$initialOrderCount}\n\n";
+            ob_flush();
+            flush();
+            
+            $lastOrderCount = $initialOrderCount;
+            $counter = 0;
+            
+            while (true) {
+                $counter++;
+                
+                // Check for new orders every 5 seconds
+                $currentOrderCount = $orderRepository->count([]);
+                
+                if ($currentOrderCount > $lastOrderCount) {
+                    error_log('[SSE] New order detected! Count changed from ' . $lastOrderCount . ' to ' . $currentOrderCount);
+                    echo "event: order_update\n";
+                    echo "data: {\"type\":\"new_order\",\"orderCount\":$currentOrderCount}\n\n";
+                    ob_flush();
+                    flush();
+                    $lastOrderCount = $currentOrderCount;
+                }
+                
+                // Send heartbeat every 15 seconds
+                if ($counter % 3 === 0) {
+                    echo ": heartbeat\n\n";
+                    ob_flush();
+                    flush();
+                }
+                
+                // Check for connection closed
+                if (connection_aborted()) {
+                    error_log('[SSE] Connection closed by client');
+                    break;
+                }
+                
+                sleep(5);
+            }
+        });
+    }
+
     #[Route('/api/orders/{id}/cancel', name: 'api_order_cancel', methods: ['PATCH'])]
     public function cancelOrder(
         int $id,

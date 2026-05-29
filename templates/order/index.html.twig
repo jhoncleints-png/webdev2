@@ -262,38 +262,35 @@
             }
         });
 
-        // DISABLED FOR FCM TESTING
-        // setInterval(async () => {
-        //     try {
-        //         console.log('[BACKEND POLLING] Checking for new orders...');
-        //         const response = await fetch('/api/orders/count');
-        //         const data = await response.json();
-        //         const orderNumbers = data.orderNumbers || [];
-        //         console.log('[BACKEND POLLING] Current order IDs:', Array.from(currentOrderIds));
-        //         console.log('[BACKEND POLLING] API returned order numbers:', orderNumbers);
-
-        //         const newOrderIds = new Set(orderNumbers);
-        //         let hasNewOrder = false;
-
-        //         orderNumbers.forEach(orderNumber => {
-        //             if (!currentOrderIds.has(orderNumber)) {
-        //                 hasNewOrder = true;
-        //                 console.log('[BACKEND POLLING] New order detected:', orderNumber);
-        //             }
-        //         });
-
-        //         if (hasNewOrder) {
-        //             console.log('[BACKEND POLLING] New order detected! Refreshing...');
-        //             showNotification('📦 New order received!', 'success');
-        //             currentOrderIds = newOrderIds;
-        //             setTimeout(() => location.reload(), 2000);
-        //         } else {
-        //             console.log('[BACKEND POLLING] No new orders');
-        //         }
-        //     } catch (error) {
-        //         console.error('[BACKEND POLLING] Polling error:', error);
-        //     }
-        // }, 5000);
+        // SSE for real-time order updates
+        const eventSource = new EventSource('/api/orders/events');
+        
+        eventSource.addEventListener('connected', (event) => {
+            console.log('[SSE] Connected to server:', event.data);
+        });
+        
+        eventSource.addEventListener('order_update', (event) => {
+            console.log('[SSE] Order update received:', event.data);
+            const data = JSON.parse(event.data);
+            
+            if (data.type === 'new_order') {
+                showNotification('📦 New order received!', 'success');
+                setTimeout(() => location.reload(), 2000);
+            } else if (data.type === 'status_change') {
+                showNotification('� Order status updated', 'info');
+                setTimeout(() => location.reload(), 2000);
+            }
+        });
+        
+        eventSource.onerror = (error) => {
+            console.error('[SSE] Connection error:', error);
+            eventSource.close();
+            // Reconnect after 5 seconds
+            setTimeout(() => {
+                console.log('[SSE] Reconnecting...');
+                location.reload();
+            }, 5000);
+        });
 
         function showNotification(message, type) {
             const toast = document.createElement('div');

@@ -67,7 +67,7 @@ security:
         - { path: ^/api/categories, roles: PUBLIC_ACCESS }
         - { path: ^/api/orders/count, roles: PUBLIC_ACCESS }
         - { path: ^/api/fcm/register, roles: PUBLIC_ACCESS }
-        - { path: ^/api/orders/events, roles: [ROLE_ADMIN, ROLE_STAFF] }
+        - { path: ^/api/orders/events, roles: PUBLIC_ACCESS }
         - { path: ^/api/me, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 

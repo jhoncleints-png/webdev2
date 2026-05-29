@@ -233,17 +233,18 @@ final class OrderController extends AbstractController
                 try {
                     error_log('[FCM] Status changed from ' . $oldStatus . ' to ' . $order->getStatus());
                     $customer = $order->getCustomer();
-                    if ($customer && $customer->getFcmToken()) {
-                        error_log('[FCM] Sending notification to customer FCM token');
+                    // FCM token is stored on User entity, not Customer entity
+                    if ($customer && $customer->getCreatedBy() && $customer->getCreatedBy()->getFcmToken()) {
+                        error_log('[FCM] Sending notification to user FCM token');
                         $result = $this->fcmService->sendOrderStatusNotification(
-                            $customer->getFcmToken(),
+                            $customer->getCreatedBy()->getFcmToken(),
                             $order->getOrderNumber(),
                             $order->getStatus(),
                             $customer->getName()
                         );
                         error_log('[FCM] Notification result: ' . ($result ? 'SUCCESS' : 'FAILED'));
                     } else {
-                        error_log('[FCM] No FCM token found for customer: ' . ($customer ? $customer->getName() : 'unknown'));
+                        error_log('[FCM] No FCM token found for user: ' . ($customer && $customer->getCreatedBy() ? $customer->getCreatedBy()->getEmail() : 'unknown'));
                     }
                 } catch (\Exception $e) {
                     // Log FCM error but don't fail the order update

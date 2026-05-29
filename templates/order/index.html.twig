@@ -179,6 +179,9 @@
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     
+    <!-- Socket.io Client -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         if ($('#orderTable').length && !$.fn.DataTable.isDataTable('#orderTable')) {
@@ -252,45 +255,33 @@
             });
         }
 
-        // Polling for new orders - eliminates F5 for admin
-        var currentOrderIds = new Set();
-        // Initialize with current order IDs from the table
-        var rows = document.querySelectorAll('#orderTable tbody tr');
-        for (var i = 0; i < rows.length; i++) {
-            var row = rows[i];
-            var firstCell = row.querySelector('td:first-child');
-            if (firstCell) {
-                var orderNumber = firstCell.textContent ? firstCell.textContent.trim() : '';
-                if (orderNumber) {
-                    currentOrderIds.add(orderNumber);
-                }
-            }
-        }
-
-        setInterval(function() {
-            fetch('/api/orders/count')
-                .then(function(response) { return response.json(); })
-                .then(function(data) {
-                    var orderNumbers = data.orderNumbers || [];
-                    var newOrderIds = new Set(orderNumbers);
-                    var hasNewOrder = false;
-
-                    orderNumbers.forEach(function(orderNumber) {
-                        if (!currentOrderIds.has(orderNumber)) {
-                            hasNewOrder = true;
-                        }
-                    });
-
-                    if (hasNewOrder) {
-                        showNotification('📦 New order received!', 'success');
-                        currentOrderIds = newOrderIds;
-                        setTimeout(function() { location.reload(); }, 2000);
-                    }
-                })
-                .catch(function(error) {
-                    console.error('[POLLING] Error:', error);
-                });
-        }, 5000);
+        // Socket.io for real-time order updates
+        var socketioServiceUrl = '{{ app.request.server.get("SOCKETIO_SERVICE_URL")|default("https://brewery-socketio-production.up.railway.app") }}';
+        var socket = io(socketioServiceUrl);
+        
+        socket.on('connect', function() {
+            console.log('[SOCKETIO] Connected to server');
+        });
+        
+        socket.on('new_order', function(data) {
+            console.log('[SOCKETIO] New order received:', data);
+            showNotification('📦 New order received! ' + data.orderNumber, 'success');
+            setTimeout(function() { location.reload(); }, 2000);
+        });
+        
+        socket.on('order_update', function(data) {
+            console.log('[SOCKETIO] Order updated:', data);
+            showNotification('� Order updated: ' + data.orderNumber, 'info');
+            setTimeout(function() { location.reload(); }, 2000);
+        });
+        
+        socket.on('disconnect', function() {
+            console.log('[SOCKETIO] Disconnected from server');
+        });
+        
+        socket.on('connect_error', function(error) {
+            console.error('[SOCKETIO] Connection error:', error);
+        });
 
         function showNotification(message, type) {
             var toast = document.createElement('div');

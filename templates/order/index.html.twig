@@ -252,7 +252,8 @@
             });
         }
 
-        // Polling for new orders - eliminates F5 for admin
+        // Polling for new orders - eliminates F5 for admin (commented out)
+        /*
         var currentOrderIds = new Set();
         // Initialize with current order IDs from the table
         var rows = document.querySelectorAll('#orderTable tbody tr');
@@ -300,6 +301,7 @@
             document.body.appendChild(toast);
             setTimeout(function() { toast.remove(); }, 3000);
         }
+        */
 
     });
 </script>

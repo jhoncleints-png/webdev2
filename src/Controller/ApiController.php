@@ -222,18 +222,6 @@ class ApiController extends AbstractController
             // Create notification for new order (outside transaction)
             $this->notificationService->notifyNewOrder($order);
 
-            // Broadcast WebSocket message for new order
-            try {
-                \App\Service\WebSocketBroadcaster::broadcastNewOrder([
-                    'orderNumber' => $order->getOrderNumber(),
-                    'customerName' => $customer->getName(),
-                    'totalAmount' => $order->getTotalAmount(),
-                    'status' => $order->getStatus(),
-                ]);
-            } catch (\Exception $e) {
-                error_log('[WEBSOCKET] Failed to broadcast new order: ' . $e->getMessage());
-            }
-
             // Check for low stock after order
             foreach ($lineItems as $line) {
                 if ($line['product']->getStockQuantity() <= 10) {

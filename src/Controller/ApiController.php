@@ -222,6 +222,18 @@ class ApiController extends AbstractController
             // Create notification for new order (outside transaction)
             $this->notificationService->notifyNewOrder($order);
 
+            // Broadcast Socket.io message for new order
+            try {
+                \App\Service\SocketioBroadcaster::broadcastNewOrder([
+                    'orderNumber' => $order->getOrderNumber(),
+                    'status' => $order->getStatus(),
+                    'customerName' => $order->getCustomer() ? $order->getCustomer()->getName() : 'Unknown',
+                    'totalAmount' => $order->getTotalAmount(),
+                ]);
+            } catch (\Exception $e) {
+                error_log('[SOCKETIO] Failed to broadcast new order: ' . $e->getMessage());
+            }
+
             // Check for low stock after order
             foreach ($lineItems as $line) {
                 if ($line['product']->getStockQuantity() <= 10) {

@@ -48,6 +48,9 @@ class SocketioBroadcaster
      */
     private static function sendBroadcast(string $url, array $payload): void
     {
+        error_log('[SOCKETIO] Starting broadcast to ' . $url . ' - Event: ' . $payload['event']);
+        error_log('[SOCKETIO] Payload: ' . json_encode($payload));
+        
         $ch = curl_init($url);
         
         curl_setopt_array($ch, [
@@ -72,8 +75,10 @@ class SocketioBroadcaster
 
         if ($httpCode !== 200) {
             error_log('[SOCKETIO] HTTP error: ' . $httpCode . ' - Response: ' . $response);
+        } else {
+            error_log('[SOCKETIO] Broadcast successful - HTTP 200 - Response: ' . $response);
         }
 
-        error_log('[SOCKETIO] Broadcast sent to ' . $url . ' - Event: ' . $payload['event']);
+        error_log('[SOCKETIO] Broadcast completed to ' . $url . ' - Event: ' . $payload['event']);
     }
 }

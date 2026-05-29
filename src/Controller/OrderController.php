@@ -245,6 +245,19 @@ final class OrderController extends AbstractController
                 $description
             );
 
+            // Broadcast Socket.io message for order update
+            if ($statusChanged) {
+                try {
+                    \App\Service\SocketioBroadcaster::broadcastOrderUpdate([
+                        'orderNumber' => $order->getOrderNumber(),
+                        'status' => $order->getStatus(),
+                        'customerName' => $order->getCustomer() ? $order->getCustomer()->getName() : 'Unknown',
+                    ]);
+                } catch (\Exception $e) {
+                    error_log('[SOCKETIO] Failed to broadcast order update: ' . $e->getMessage());
+                }
+            }
+
             $this->addFlash('success', 'Order updated successfully!');
             return $this->redirectToRoute('app_order_index', [], Response::HTTP_SEE_OTHER);
         }

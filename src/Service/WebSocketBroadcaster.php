@@ -9,7 +9,12 @@ class WebSocketBroadcaster
 
     public static function init(): void
     {
-        self::$websocketUrl = getenv('WEBSOCKET_SERVICE_URL') ?: 'http://localhost:8080';
+        $url = getenv('WEBSOCKET_SERVICE_URL') ?: 'http://localhost:8080';
+        // Add protocol if missing
+        if (!preg_match('/^https?:\/\//', $url)) {
+            $url = 'https://' . $url;
+        }
+        self::$websocketUrl = $url;
         self::$enabled = getenv('WEBSOCKET_ENABLED') !== 'false';
     }
 

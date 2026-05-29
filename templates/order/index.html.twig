@@ -254,9 +254,8 @@
 
         // WebSocket for real-time order updates
         var wsProtocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-        var wsHost = window.location.hostname;
-        var wsPort = '8080'; // WebSocket service port
-        var ws = new WebSocket(wsProtocol + wsHost + ':' + wsPort);
+        var wsHost = 'web-production-5c257.up.railway.app'; // WebSocket service host
+        var ws = new WebSocket(wsProtocol + wsHost);
         
         ws.onopen = function() {
             console.log('[WEBSOCKET] Connected to server');

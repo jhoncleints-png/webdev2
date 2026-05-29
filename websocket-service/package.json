@@ -1,0 +1,12 @@
+{
+  "name": "brewery-websocket",
+  "version": "1.0.0",
+  "description": "WebSocket service for real-time order updates",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "ws": "^8.14.2"
+  }
+}

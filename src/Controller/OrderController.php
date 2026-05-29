@@ -228,6 +228,17 @@ final class OrderController extends AbstractController
 
             $entityManager->flush();
 
+            // Broadcast WebSocket message for order update
+            try {
+                \App\Service\WebSocketBroadcaster::broadcastOrderUpdate([
+                    'orderNumber' => $order->getOrderNumber(),
+                    'status' => $order->getStatus(),
+                    'customerName' => $order->getCustomer() ? $order->getCustomer()->getName() : 'Unknown',
+                ]);
+            } catch (\Exception $e) {
+                error_log('[WEBSOCKET] Failed to broadcast order update: ' . $e->getMessage());
+            }
+
             // LOG ORDER UPDATE
             $newStatus = $order->getStatus();
             $statusChanged = $oldStatus !== $newStatus;
